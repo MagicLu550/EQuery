@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT xml-instance (maven*,xml*,xml-file*)>
+<!ELEMENT xml-file (#PCDATA)>
+<!ELEMENT xml (file,root,is-sync,url)*>
+<!ELEMENT file (#PCDATA)>
+<!ELEMENT root (#PCDATA)>
+<!ELEMENT is-sync (#PCDATA)>
+<!ELEMENT url (#PCDATA)>
+<!ATTLIST file name CDATA #REQUIRED>
+<!ATTLIST root name CDATA #REQUIRED>
+<!ATTLIST is-sync state (true|false) "false">
+<!ATTLIST url url CDATA "">
+<!ATTLIST xml-file package CDATA #REQUIRED>
+<!ENTITY web "www.noyark.net">
+<!ELEMENT maven (dep)*>
+<!ELEMENT dep (gid,aid,ver)*>
+<!ELEMENT gid (#PCDATA)>
+<!ELEMENT aid (#PCDATA)>
+<!ELEMENT ver (#PCDATA)>
+<!ATTLIST gid name CDATA #REQUIRED>
+<!ATTLIST aid name CDATA #REQUIRED>
+<!ATTLIST ver ver CDATA #REQUIRED>
+

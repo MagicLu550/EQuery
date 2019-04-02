@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <!-- 
+ GulesBerry Tech. Co. Ltd. (C) noyark-system Hector Group
+ (GHG China) @Freedom Web of java
+ @noyark - system group for xml
+ @github magiclu550 author
+ @noter K.J author 
+ @qq 843983728
+ @using dom4j
+ @school: JiaoNan No.1 middle School
+ override this none
+ please see our website:
+  	###############################################
+  					
+  					     www.noyark.net/index.html
+  
+ 	###############################################
+  
+  @where China shandong qingdao
+  
+  author is a middle school student,so he doesn't have much time.If you think his code is good for you,you
+  can touch the 'star',thanks
+ 	use dom4j,mysql-connection,dbcp
+ 
+  -->
+ <!-- The plugin extends the dom4j,thanks for them -->
+  <modelVersion>4.0.0</modelVersion>
+  <dependencies>
+  		<dependency>
+  			<groupId>dom4j</groupId>
+  			<artifactId>dom4j</artifactId>
+  			<version>1.6.1</version>
+		</dependency>
+<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+    		<groupId>mysql</groupId>
+    		<artifactId>mysql-connector-java</artifactId>
+    		<version>8.0.15</version>
+		</dependency>
+		<dependency>
+  		<groupId>commons-dbcp</groupId>
+  		<artifactId>commons-dbcp</artifactId>
+  		<version>1.4</version>
+		</dependency>
+</dependencies>
+  <!-- use aliyun's maven repository-->
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>http://maven.aliyun.com/nexus/content/repositories/central</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  
+  <groupId>net.noyark</groupId>
+  <version>0.2.8</version>
+  <name>Simple XML for Java [use dom4j] by Noyark-System</name>
+  <url>http://sxml.noyark.net</url>
+  <organization>
+  	<name>Gulesberry Ltd. Hector Noyark-System</name>
+  	<url>http://magic.noyark.net</url>
+  </organization>
+  <scm>
+  	<url>http://blog.noyark.net</url>
+  	<connection>{@MySQL} www.noyark.net/version::version</connection>
+  	<developerConnection>MagicLu550 &amp;&amp; K.J(Noter)</developerConnection>
+  </scm>
+  <inceptionYear>2019</inceptionYear>
+  <properties>
+  	<version>0.2.8</version>
+  	<author>MagicLu550&amp;&amp;K.J</author>
+  </properties>
+  <issueManagement>
+  	<url>https://github.com/MagicLu550/SimpleXML/tree/master/src/main/java/cn/gulesberry/www/utils</url>
+  </issueManagement>
+  <artifactId>equery-framework</artifactId>
+  <description> * WEB:&lt;a href=&quot;http://magic.noyark.net&quot;&gt;web&lt;/a&gt;
+ * DOC:&lt;a href=&quot;http://sxml.noyark.net&quot;&gt;doc&lt;/a&gt;
+ * implementation the &lt;code&gt;{@link net.noyark.www.inter.Queryer}&lt;/code&gt;
+ * &lt;p&gt;
+ * The &lt;code&gt;driver&lt;/code&gt; class of the api can detect
+ * the version number and whether you have 
+ * installed the dependency library of this
+ * api.It can automatically assemble the &lt;i&gt;dependency
+ * library&lt;/i&gt; and read and write the corresponding 
+ * configuration folder to realize the hungry instantiation
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * This xml framework simplifies the operation of the persistence 
+ * layer configuration file and supports the object's IOC, which greatly 
+ * simplifies the operation and is compatible with the usual dom4j operations.
+ * It can be used in parallel with the traditional method (of course, the corresponding
+ * method has been provided in the framework. You must use the methods of the framework 
+ * to add elements, but these methods have simplified operations on the framework, as well 
+ * as the original operation. Because the elements are added to the framework to register 
+ * elements to the mapping factory and are compatible with the operation of the selector,
+ *  and the selector is added. Function, complete element selection mechanism, selector 
+ * ::with * 6 features *:: ： 
+ * 
+ * &lt;P&gt;dynamic creation (DC) combined with read and write (RW) reflection path control (RPC) automatic assembly (AA) selection and 
+ * converter (SC) object pool (OP) 
+ * , search package instance (SPI)
+ * &lt;P&gt;DC: meaning that objects can be created dynamically and created according to various forms of configuration files,
+ *  which is very flexible
+ * &lt;P&gt;RW: means that it can be compatible with the newly added elements of the document that has been written, and will not 
+ * refresh the original created document.
+ * &lt;P&gt;RPC:  meaning the rules of the elements are created by path and reflection, thus simply adding elements
+ * &lt;P&gt;AA:  meaning that the maven dependencies can be automatically assembled by loading the framework driver.
+ * &lt;P&gt;SC: built-in converter can convert dom4j Element object into SElement recording element geometry information, and then 
+ * used for selector hash query element
+ * &lt;P&gt;OP: the object pool can store the original object, the previously created object can be reused
+ * &lt;P&gt;SPI: through the package path of the configuration file, search for the class with annotations, instantiate the object according to the annotation, 
+ * and create the file at one time
+ * &lt;/p&gt;</description>
+</project>
