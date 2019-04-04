@@ -255,7 +255,7 @@ How to import the plugin?
     <pluginRepository>
       <id>nexus</id>
       <name>Team Neux Repository</name>
-      <url>http://1www.noyark.net:8081/nexus/content/groups/public/</url>
+      <url>http://www.noyark.net:8081/nexus/content/groups/public/</url>
     </pluginRepository>
  </pluginRepositories>
 
