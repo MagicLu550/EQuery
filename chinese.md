@@ -233,7 +233,7 @@ HOW TO USE EPATH
 
 如何导入该插件？
 ```xml
-<!-- 链接jar --!>
+<!-- 链接jar -->
 <dependency>
   <groupId>net.noyark</groupId>
   <artifactId>equery-framework</artifactId>
