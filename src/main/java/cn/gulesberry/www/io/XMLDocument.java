@@ -26,18 +26,23 @@
  */
 package cn.gulesberry.www.io;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -54,6 +59,7 @@ import cn.gulesberry.www.conn.ConnectionBase;
 import cn.gulesberry.www.entity.SElement;
 import cn.gulesberry.www.exception.IllegalMappingException;
 import cn.gulesberry.www.exception.IndexLengthException;
+import cn.gulesberry.www.exception.SynaxException;
 import cn.gulesberry.www.helper.InstanceQueryer;
 import cn.gulesberry.www.helper.XMLHelper;
 import cn.gulesberry.www.manager.InitXMLManager;
@@ -61,6 +67,7 @@ import cn.gulesberry.www.manager.XMLManager;
 import cn.gulesberry.www.utils.table.NodeTable;
 import cn.gulesberry.www.utils.tree.ElementTree;
 import cn.gulesberry.www.utils.tree.TreeWaterMan;
+import net.noyark.www.console.Console;
 import net.noyark.www.interf.Branch;
 import net.noyark.www.interf.Manager;
 import net.noyark.www.interf.Table;
@@ -1077,7 +1084,7 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 */
 	@SuppressWarnings("unchecked")
 	public Element readElementOtherInThis(String otherFile,String elements,int... indexs) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
-		XMLDomFile simpleML =  InstanceQueryer.getDefaultXml(otherFile);
+		XMLDomFile simpleML =  InstanceQueryer.getDefaultXml(otherFile,this);
 		Element e = simpleML.getElement(elements, indexs);
 		if(e!=null) {
 			List<Attribute> aList = e.attributes();
@@ -1427,6 +1434,327 @@ public abstract class XMLDocument  implements XMLDomFile{
 		}
 	}
 	/**
+	 * You can use epath expressions
+	 * to select elements,which is a simpler
+	 * version of xpath
+	 * <br>
+	 * EXPRESSIONS SYNTAX v001:
+	 * <br>
+	 *	all element:
+	 * 	all;
+	 * <br>
+	 * 	Common selection: 
+	 * 	a[0].b[0].c[0] [selector options];
+	 * 	<br>
+	 * 	Coordinated:
+	 * 	a[index].b[index].c[index] [selector options];
+	 * <br>
+	 * 	Without coordinates:
+	 * 	a.b.c [selector options];
+	 *  <br>
+	 * 	only by text:
+	 * 	text [text];
+	 * <br>
+	 * 	Name selection:
+	 * 	name [name]
+	 * <br>
+	 * 	Namespace:
+	 * 	path prefix/uri [prefix/uri];
+	 * 	path prefix-uri [namespace];
+	 * <br>
+	 * 	attribute by name and value:
+	 * 	path key=value,key=value [key=value];
+	 * <br>
+	 * 	attribute by attribute name
+	 * 	path name,name [key];
+	 * <br>
+	 * 	attribute by attribute name and key name
+	 * 	name name,name [key];
+	 * <br>
+	 * 	attribute by only these:
+	 * 	name name,name [key,only];
+	 * 	path key=value,key=value [key=value];
+	 * <br>
+	 * 	by text and name:
+	 * 	name text [text,name];
+	 * <br>
+	 * 	by text and path:
+	 * 	path text [text];
+	 * <br>
+	 * 	Sequenital pirority name>only>[uri-prefix/namespace>text>key=value/key/value] <br>
+	 * 	complex:<br>
+	 * 	path uri-prefix text [path,namespace,text];<br>
+	 * 	path namespace-uri/prefix text [path,uri/prefix,text];<br>
+	 * 	path text key=value [path,uri/prefix,key=value];<br>
+	 * 	path  text key=value [path,text,key=value];<br>
+	 * 	name namespace text [name,uri/prefix,text];<br>
+	 * 	name text key=value [name,text,key=value];<br>
+	 * 	name text key=value [name,text,key=value];<br>
+	 * 	name text key [name,text,key];<br>
+	 * 	name uri-prefix text [namespace];
+	 * 	name text key [name,only,text,key];
+	 * 	etc.
+	 * @param expressions the epath expressions
+	 * @return the elements  object list
+	 * @see Query
+	 */
+	public List<Element> EPathSelector(String expressions) {
+		try {
+			String[] childSynax = expressions.split(" ");
+			if(childSynax.length==1) {
+				if(childSynax[0].equals("all")) {
+					return getAllElements();
+				}else {
+					Console.err("the 'all' synax is error");
+				}
+			}else if(childSynax.length==2) {
+				String selectorOption = childSynax[1].substring(childSynax[1].indexOf("[")+1,childSynax[1].indexOf("]"));//get the second
+				switch (selectorOption) {
+					case "one":
+						return $(Query.ELEMENT,childSynax[0]);
+					case "elements":
+						return $(Query.ELEMENTS,childSynax[0]);
+					case "on":
+						return $(Query.BROTHER_ON,childSynax[0]);
+					case "under":
+						return $(Query.BROTHER_UNDER,childSynax[0]);
+					case "ons":
+						return $(Query.BROTHERS_ON,childSynax[0]);
+					case "unders":
+						return $(Query.BROTHERS_UNDER,childSynax[0]);
+					case "friends":
+						return $(Query.FRIENDS,childSynax[0]);
+					case "ids":
+						return $(Query.ELEMENTS_ID,childSynax[0]);
+					case "e_name":
+						return $(Query.ELEMENTS_NAME,childSynax[0]);
+					case "text":
+						return $(Query.ELEMENTS_TEXT,childSynax[0]);
+					case "parent":
+						return $(Query.PARENT,childSynax[0]);
+					case "name":
+						if(childSynax[0].indexOf("[")!=-1) {
+							Console.err("the [name] selector synax error:no index");
+						}
+						return getElementsByName(childSynax[0]);
+					default:
+						Console.err("the [selector] synax is error");
+						break;
+					}
+			}else if(childSynax.length==3) {
+				List<Element> get = new ArrayList<>(); 
+				String firstOption = childSynax[0];//path
+				String middleOption = childSynax[1];//text
+				String selectorOption = childSynax[2].substring(childSynax[2].indexOf("[")+1,childSynax[2].indexOf("]"));//get the third
+				return selectByThreeSynax(get, firstOption, middleOption, selectorOption);
+			//new version
+			}else if(childSynax.length>=4){
+				String firstOption = childSynax[0];//path
+				String selectorOption = childSynax[childSynax.length-1].substring(childSynax[childSynax.length-1].indexOf("[")+1,childSynax[childSynax.length-1].indexOf("]"));//get the third
+				List<String> options = Arrays.asList(selectorOption.split(","));
+				List<Element> allElement;
+				if(options.contains("name")) {
+					allElement = getElementsByName(firstOption);
+				}else {
+					allElement = getElements(firstOption);//get all middle option
+				}
+				boolean isOnly = false;
+				for(int i=0;i<options.size();i++) {
+					String option = options.get(i);
+					if(option.equals("only")){
+						isOnly = true;
+					}else if(!option.trim().equals("name")&&!option.trim().equals("path")&&!option.trim().equals("only")){
+						String text;
+						if(isOnly) {
+							text = childSynax[i-1]+"";
+						}else {
+							text = childSynax[i]+"";
+						}
+						if(text.indexOf("[")!=-1) {
+							text = text.substring(text.indexOf("[")+1,text.indexOf("]"));
+						}
+						if(option.equals("namespace")) {
+							String[] nss = text.split("-"); 
+							allElement = getByNameSpaceFromElements(allElement, nss[0],nss[1]);
+						}else if(option.equals("prefix")){
+							allElement = getByNameSpaceFromElements(allElement,text,null);
+						}else if(option.equals("text")) {
+							allElement = getByTextFromElements(allElement, text);
+						}else if(option.equals("key=value")){
+							String[] kv = text.split(",");
+							allElement = getByAttributeFromElements(allElement,kv);
+						}else if(option.equals("key")) {
+							String[] keys = text.split(",");
+							allElement = getByAttributeKeyFromElements(allElement,isOnly,true,keys);
+						}else if(option.equals("value")) {
+							String[] values = text.split(",");
+							allElement = getByAttributeKeyFromElements(allElement, isOnly,false, values);
+						}
+					}
+				}
+				return allElement;
+			}
+		}catch(StringIndexOutOfBoundsException e2) {
+			Console.err("java StringIndexOutOfBoundsException exception error:the element don't have index");
+		}catch(IndexOutOfBoundsException e1) {
+			Console.err("java IndexOutOfBoundsException exception error:the element in the indexs do not exist");
+		}catch(SynaxException e3) {
+			Console.err(e3.getMessage());
+		}
+		Console.err("error:");
+		throw new SynaxException("the synax is error");
+	}
+	/**
+	 * This method can parse the file that have epath
+	 * @param file the epath file (.equery)
+	 * @return the NodeTable(Line and Results)
+	 * @throws IOException
+	 * @throws DocumentException 
+	 * @throws IndexLengthException 
+	 * @throws IllegalMappingException 
+	 */
+	public NodeTable<Integer,Element> sourceEPathFile(String file) throws IOException, IllegalMappingException, IndexLengthException, DocumentException{
+		String[] expressions;
+		if(file.endsWith(".xml")) {
+			XMLDomFile xdf = InstanceQueryer.getDefaultXml(file,this);
+			xdf.clearMapping();
+			List<Element> epathes = xdf.getElements("epath");
+			expressions = new String[epathes.size()];
+			for(int i = 0;i<epathes.size();i++) {
+				expressions[i] = epathes.get(i).getText();
+			}
+		}else {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+			StringBuilder builder = new StringBuilder();
+			String expression = null;
+			while((expression=reader.readLine())!=null) {
+				builder.append(expression);
+			}
+			expressions = builder.toString().split(";");
+			reader.close();
+		}
+		NodeTable<Integer, Element> table = new NodeTable<>();
+		for(int i = 0;i<expressions.length;i++) {
+			String exp = expressions[i].trim();
+			try {
+				List<Element> all = EPathSelector(exp);
+				table.putAll(i,all.toArray(new Element[all.size()]));
+			}catch(Exception s) {
+				Console.err("on line "+(i+1)+" have a error:"+s.getMessage());
+				return null;
+			}
+		}
+		return table;
+	}
+	/**
+	 * This method can select the elements in the element list
+	 * @param list the element object list
+	 * @param prefix if it is null,will only select by uri
+	 * @param uri if it is null,will only select by prefix
+	 * @return the element list
+	 */
+	public List<Element> getByNameSpaceFromElements(List<Element> list,String prefix,String uri){
+		List<Element> elements = new ArrayList<>();
+		for(Element e:list) {
+			if(uri!=null && prefix !=null) {
+				Namespace uriSpace = e.getNamespaceForURI(uri);
+				Namespace prefixSpace = e.getNamespaceForPrefix(prefix);
+				if(uriSpace!=null&&uriSpace.equals(prefixSpace)) {
+					elements.add(e);
+				}
+			}else if(uri!=null) {
+				Namespace uriSpace = e.getNamespaceForURI(uri);
+				if(uriSpace!=null) {
+					elements.add(e);
+				}
+			}else if(prefix!=null) {
+				Namespace prefixSpace = e.getNamespaceForURI(prefix);
+				if(prefixSpace!=null) {
+					elements.add(e);
+				}
+			}
+		}
+		return elements;
+	}
+	
+	/**
+	 * This method can select the elements in the element list
+	 * @param list the element list
+	 * @param text the text
+	 * @return the element object list
+	 */
+	private List<Element> getByTextFromElements(List<Element> list,String text){
+		List<Element> elements = new ArrayList<>();
+		for(Element e:list) {
+			if(e.getText().equals(text)) {
+				elements.add(e);
+			}
+		}
+		return elements;
+	}
+	/**
+	 * This method can select the elements in the element list
+	 * @param list the element list
+	 * @param isOnly whether is 'isOnly'
+	 * @param key the keys
+	 * @return the element object
+	 */
+	private List<Element> getByAttributeKeyFromElements(List<Element> list,boolean isOnly,boolean isKey,String... key){
+		List<Element> get = new ArrayList<>();
+		List<String> onlyValueAttrs = new ArrayList<>();
+		List<Element> onlyList = getAllElements();// get all
+		for(Element e:onlyList) {
+			@SuppressWarnings("unchecked")
+			List<Attribute> attributes = e.attributes();
+			for(Attribute a:attributes) {
+				if(isKey) {
+					onlyValueAttrs.add(a.getName());
+				}else {
+					onlyValueAttrs.add(a.getValue());
+				}
+			}
+			if(isOnly) {
+				if(onlyValueAttrs.containsAll(Arrays.asList(key))&&onlyValueAttrs.size()==key.length) {
+					get.add(e);
+				}
+			}else {
+				if(onlyValueAttrs.containsAll(Arrays.asList(key))) {
+					get.add(e);
+				}
+			}
+		}
+		return get;
+	}
+	/**
+	 * It can get the elements by key and value
+	 * @param list the list
+	 * @param entrys the key-value
+	 * @return the element objects
+	 */
+	@SuppressWarnings("unchecked")
+	private List<Element> getByAttributeFromElements(List<Element> list,String[] entrys){
+		List<Element> get = new ArrayList<>();
+		Map<String, String> alls = new HashMap<>();
+		for(String e:entrys) {
+			
+			String[] s = e.split("=");
+			alls.put(s[0],s[1]);
+		}
+		int i = 0;
+		for(Element e:list) {
+			List<Attribute> attributes = e.attributes();
+			for(Attribute a:attributes) {
+				if(alls.containsKey(a.getName())&&alls.containsValue(a.getValue()))
+					i++;
+			}
+			if(i==entrys.length) {
+				get.add(e);
+			}
+		}
+		return get;
+	}
+	
+	/**
 	 * <p>
 	 * This constructor is used to build file manipulation objects for 
 	 * manipulating existing files. After the 
@@ -1476,5 +1804,64 @@ public abstract class XMLDocument  implements XMLDomFile{
 		this.list = new ArrayList<SElement>();
 		this.isDefault = isDefault;
 	}
-	
+	/**
+	 * This can select for three synax,only use inside
+	 * @param get the list
+	 * @param firstOption the first of childOption
+	 * @param middleOption the middle of childOption
+	 * @param selectorOption the last od childOption
+	 * @return the element object list
+	 */
+	@SuppressWarnings("unchecked")
+	private List<Element> selectByThreeSynax(List<Element> get,String firstOption,String middleOption,String selectorOption){
+		switch(selectorOption) {
+			case "text":
+				List<Element> pathGet = getElements(firstOption);
+				for(Element e:pathGet) {
+					if(e.getText().equals(middleOption)) {
+						get.add(e);
+					}
+				}
+				return get;
+			case "namespace":
+				String[] group = middleOption.split(",");
+				return getElementsByNameSpace(group[0],group[1]);
+			case "key":
+				String[] keys = middleOption.split(",");
+				return getElementsByAttributes(keys);
+			case "value":
+				String[] values = middleOption.split(",");
+				List<String> valueAttrs = new ArrayList<>();
+				List<Element> list = getAllElements();// get all
+				for(Element e:list) {
+					List<Attribute> attributes = e.attributes();
+					for(Attribute a:attributes) {
+						valueAttrs.add(a.getValue());
+					}
+					if(valueAttrs.containsAll(Arrays.asList(values))) {
+						get.add(e);
+					}
+				}
+				return get;
+			case "key=value":
+				String[] entrys = middleOption.split(",");
+				return getByAttributeFromElements(getAllElements(), entrys);
+			case "uri":
+				return getElementsByNameSpace(middleOption,true);
+			case "prefix":
+				return getElementsByNameSpace(middleOption, false);
+			case "text,name":
+				List<Element> byTexts = getElementsByName(firstOption);
+				for(Element e:byTexts) {
+					if(e.getText().equals(middleOption)) {
+						get.add(e);
+					}
+				}
+				return get;
+			case "value,only":
+				String[] onlyValues = middleOption.split(",");
+				return getByAttributeKeyFromElements(getAllElements(), true,false,onlyValues);
+		}
+			throw new SynaxException("the synax is illegal");
+	}
 }

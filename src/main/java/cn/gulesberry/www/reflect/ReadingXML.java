@@ -100,7 +100,7 @@ public abstract class ReadingXML {
 	}
 	public ReadingXML(String file) throws DocumentException, IllegalMappingException, IndexLengthException, IOException, IllegalArgumentException, IllegalAccessException {
 		this();
-		xMl = InstanceQueryer.getDefaultXml(file);
+		xMl = InstanceQueryer.getDefaultXml(file,this);
 		setObject(getObject());
 	}
 	public ReadingXML(String file,InputStream in) throws DocumentException, IllegalMappingException, IndexLengthException, IOException, IllegalArgumentException, IllegalAccessException {
@@ -188,7 +188,7 @@ public abstract class ReadingXML {
 	 */
 	public void setDefaultXML(String file) {
 		try {
-			InstanceQueryer.getDefaultXml(file);
+			InstanceQueryer.getDefaultXml(file,this);
 		} catch (DocumentException | IllegalMappingException | IndexLengthException | IOException e) {
 			e.printStackTrace();
 		}

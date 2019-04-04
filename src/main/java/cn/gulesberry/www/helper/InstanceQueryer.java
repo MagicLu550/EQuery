@@ -43,6 +43,8 @@ import static cn.gulesberry.www.helper.XMLHelper.instancesPool;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,14 +160,28 @@ public class InstanceQueryer {
 	 *  	you can use file start with classpath:
 	 * </p>
 	 * @param file  the xml file name
+	 * @param getStream whether get the inputstream of resources,if it is true,you cannot write
+	 * @param o is always 'this'
 	 * @return the XMLFile Instance
 	 * @throws DocumentException if your document have some errors..
 	 * @throws IllegalMappingException you can see the {@link cn.gulesberry.www.exception.IllegalMappingException}
 	 * @throws IndexLengthException you can see the {@link cn.gulesberry.www.exception.IndexLengthException}
 	 * @throws IOException if your File is not found
 	 */
-	public static XMLDomFile getDefaultXml(String file) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
+	public static XMLDomFile getDefaultXml(String file,Object o,boolean... getStream) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
 		List<Element> elements = new ArrayList<>();
+		SAXReader reader = new SAXReader();	
+		boolean isStream = false;
+		if(getStream.length>0) {
+			isStream = getStream[0];
+		}
+		if(isStream) {
+			Reader reader2 = new InputStreamReader(o.getClass().getClassLoader().getResourceAsStream(file));
+			Document doc = reader.read(reader2);
+			XMLDomFile xdf = XMLHelper.setElements(file, doc, elements);
+			xdf.save();
+			return xdf;
+		}
 		if(file.startsWith("classpath:")) {
 			file = (SetMavenJar.getInstance().getClass().getResource("/").getPath()+file.substring("classpath:".length())).replaceAll("test-classes", "classes");
 		}
@@ -174,7 +190,6 @@ public class InstanceQueryer {
 				file = XMLHelper.setFileName(file);
 				File xmlFile = new File(file);
 			if(xmlFile.exists()) {
-					SAXReader reader = new SAXReader();	
 					File dir = new File(SetMavenJar.getInstance().getClass().getResource("/").getPath()+"/mapping");
 					dir.mkdir();
 					File mapping = new File(SetMavenJar.getInstance().getClass().getResource("/").getPath()+"mapping/"+file.replaceAll("/", "-"));

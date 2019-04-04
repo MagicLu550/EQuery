@@ -43,6 +43,7 @@ import cn.gulesberry.www.exception.IndexLengthException;
 import cn.gulesberry.www.exception.SElementClassCastException;
 import cn.gulesberry.www.helper.XMLHelper;
 import cn.gulesberry.www.io.XMLDocument;
+import cn.gulesberry.www.utils.table.NodeTable;
 import net.noyark.www.annotations.GetBrother;
 import net.noyark.www.annotations.IndexMappingNumberDigital;
 import net.noyark.www.list.ElementSubIndex;
@@ -1156,4 +1157,89 @@ public interface XMLDomFile extends Serializable,Cloneable{
 	default void clearMapping() {
 		
 	}
+	/**
+	 * You can use epath expressions
+	 * to select elements,which is a simpler
+	 * version of xpath
+	 * <br>
+	 * EXPRESSIONS SYNTAX v001:
+	 * <br>
+	 *	all element:
+	 * 	all;
+	 * <br>
+	 * 	Common selection: 
+	 * 	a[0].b[0].c[0] [selector options];
+	 * 	<br>
+	 * 	Coordinated:
+	 * 	a[index].b[index].c[index] [selector options];
+	 * <br>
+	 * 	Without coordinates:
+	 * 	a.b.c [selector options];
+	 *  <br>
+	 * 	only by text:
+	 * 	text [text];
+	 * <br>
+	 * 	Name selection:
+	 * 	name [name]
+	 * <br>
+	 * 	Namespace:
+	 * 	path prefix/uri [prefix/uri];
+	 * 	path prefix-uri [namespace];
+	 * <br>
+	 * 	attribute by name and value:
+	 * 	path key=value,key=value [key=value];
+	 * <br>
+	 * 	attribute by attribute name
+	 * 	path name,name [key];
+	 * <br>
+	 * 	attribute by attribute name and key name
+	 * 	name name,name [key];
+	 * <br>
+	 * 	attribute by only these:
+	 * 	name name,name [key,only];
+	 * 	path key=value,key=value [key=value];
+	 * <br>
+	 * 	by text and name:
+	 * 	name text [text,name];
+	 * <br>
+	 * 	by text and path:
+	 * 	path text [text];
+	 * <br>
+	 * 	Sequenital pirority name>[uri-prefix/namespace>text>key=value/key/value]>only <br>
+	 * 	complex:<br>
+	 * 	path uri-prefix text [namespace,text];<br>
+	 * 	path namespace-uri/prefix text [uri/prefix,text];<br>
+	 * 	path text key=value [uri/prefix,key=value];<br>
+	 * 	path  text key=value [text,key=value,only];<br>
+	 * 	name namespace text [name,uri/prefix,text];<br>
+	 * 	name text key=value [name,text,key=value];<br>
+	 * 	name text key=value [name,text,key=value,only];<br>
+	 * 	name text key [name,text,key];<br>
+	 * 	name uri-prefix text [namespace];
+	 * 	
+	 * @param expressions the epath expressions
+	 * @return the elements  object list
+	 * @see Query
+	 */
+	List<Element> EPathSelector(String expressions);
+	
+	/**
+	 * This method can select the elements in the element list
+	 * @param list the element object list
+	 * @param prefix if it is null,will only select by uri
+	 * @param uri if it is null,will only select by prefix
+	 * @return the element list
+	 */
+	List<Element> getByNameSpaceFromElements(List<Element> list,String prefix,String uri);
+	
+	/**
+	 * This method can parse the file that have epath
+	 * @param file the epath file (.equery)
+	 * @return the NodeTable(Line and Results)
+	 * @throws IOException
+	 * @throws DocumentException 
+	 * @throws IndexLengthException 
+	 * @throws IllegalMappingException 
+	 */
+	NodeTable<Integer,Element> sourceEPathFile(String file) throws IOException, IllegalMappingException, IndexLengthException, DocumentException;
 }

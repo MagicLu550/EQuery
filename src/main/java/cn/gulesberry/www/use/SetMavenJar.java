@@ -27,6 +27,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -140,7 +143,7 @@ public class SetMavenJar {
 		String path = this.getClass().getResource("/").getPath();
 		String dtdPath = path.substring(0,path.indexOf("target"))+"/target/classes/"+mainProperties.getStartDTD();
 		path = path.substring(0,path.indexOf("target"))+"target/classes/"+xmlDefault;
-		XMLDomFile xdf = InstanceQueryer.getDefaultXml(path.substring(0,path.indexOf("target"))+"src/main/resources/"+mainProperties.getInstancePath());
+		XMLDomFile xdf = InstanceQueryer.getDefaultXml(path.substring(0,path.indexOf("target"))+"src/main/resources/"+mainProperties.getInstancePath(),this);
 		xdf.addDOCTYPE("xml-instance",null,dtdPath);
 		xdf.save();
 		document2 = builder.parse(in);
@@ -260,52 +263,106 @@ public class SetMavenJar {
 		InputStream input = new FileInputStream(path);
 		org.w3c.dom.Document document = builder.parse(input);
 		NodeList nl = document.getElementsByTagName("xml-file");
-		String thisSrc = this.getClass().getResource("/").getPath();//this class
-		String otherSrc;
-		if(thisSrc.indexOf("test-classes")!=-1) {
-			otherSrc = thisSrc.replaceAll("test-classes","classes");
-		}else {
-			otherSrc = thisSrc.replaceAll("classes","test-classes");
+		List<String> packagePathes = new ArrayList<>();
+		for(int i = 0;i<nl.getLength();i++) {
+			String packet = nl.item(i).getAttributes().item(0).getNodeValue();
+			packagePathes.add(packet);
 		}
-		String[] allSrc = {thisSrc,otherSrc};
-		for(String src:allSrc) {
-			for(int i = 0;i<nl.getLength();i++){
-				String packet = nl.item(i).getAttributes().item(0).getNodeValue();
-				String before = packet;
-				packet = packet.replaceAll(XMLDocument.POINT, "/");
-				String classPath = src+packet+"/";
-				File[] classes = new File(classPath).listFiles();
-				if(classes!=null) {
-					for(File f:classes){
-						if(f.getName().endsWith(".class")){
-							Class<?> clz = Class.forName(before+"."+f.getName().substring(0,f.getName().indexOf(".")));
-							Annotation anno = clz.getDeclaredAnnotation(XMLFile.class);
-							if(anno!=null){
-								if(!clz.getSuperclass().getSimpleName().equals("ReadingXML")){
-									throw new ClassNotFoundException("the superclass is not ReadingXML");
+		scanPackage(packagePathes);
+	}
+	/**
+	 * Its role is to further parse
+	 * the obtained class and resolve it to
+	 * an instance; 
+	 * @param allPackages the package path list from xml
+	 * @throws IllegalMappingException
+	 * @throws IndexLengthException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws IOException
+	 * @throws DocumentException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 */
+	private void scanPackage(List<String> allPackages) throws IllegalMappingException, IndexLengthException, IllegalArgumentException, IllegalAccessException, IOException, DocumentException, ClassNotFoundException, InstantiationException {
+		for(String pack:allPackages) {
+			String classPath = this.getClass().getResource("/").getPath();
+			String otherPath;
+			if(classPath.indexOf("test-classes")!=-1) {
+				otherPath = classPath.replace("test-classes","classes");
+			}else {
+				otherPath = classPath.replace("classes","test-classes");
+			}
+			String[] allPath = {classPath,otherPath};
+			for(String path:allPath) {
+				String packagePath = path+pack.replaceAll(XMLDocument.POINT,"/");
+				File file = new File(packagePath);
+				List<File> fileName = loadClass(file);
+				for(File f1:fileName) {
+					if(f1.getName().endsWith(".class")) {
+						String classpath = f1.getPath();
+						classpath = classpath.substring(classpath.indexOf("classes")+"classes".length()+1,classpath.indexOf(".class")).replaceAll("/",".");
+						Class<?> clz = Class.forName(classpath);
+						Annotation anno = clz.getDeclaredAnnotation(XMLFile.class);
+						if(anno!=null){
+							if(!clz.getSuperclass().getSimpleName().equals("ReadingXML")){
+								throw new ClassNotFoundException("the superclass is not ReadingXML");
+							}
+							XMLFile xmlFile = (XMLFile)anno;
+							String root = xmlFile.root();
+							String file1 = xmlFile.fileName();
+							boolean isDefault = xmlFile.isDefault();
+							//获得类型
+							ReadingXML object = (ReadingXML)clz.newInstance();
+							if(isDefault){
+								object.setDefaultXML(file1);
+								object.setObject(object.getObject());
+								object.save();
+							}else{
+								if(xmlFile.xmlns().equals("")) {
+									object.setInitXML(file1, root);
+								}else {
+									object.setInitXML(file1, root,xmlFile.xmlns());
 								}
-								XMLFile xmlFile = (XMLFile)anno;
-								String root = xmlFile.root();
-								String file = xmlFile.fileName();
-								boolean isDefault = xmlFile.isDefault();
-								//获得类型
-								ReadingXML object = (ReadingXML)clz.newInstance();
-								if(isDefault){
-									object.setDefaultXML(file);
-									object.setObject(object.getObject());
-									object.save();
-								}else{
-									if(xmlFile.xmlns().equals("")) {
-										object.setInitXML(file, root);
-									}else {
-										object.setInitXML(file, root,xmlFile.xmlns());
-									}
-									object.setObject(object.getObject());
-									object.save();
-								}
+								object.setObject(object.getObject());
+								object.save();
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+	/**
+	 * It can get Package and Classes next the root package
+	 * @param file the classpath file
+	 * @return the file about classes and package
+	 */
+	private List<File> loadClass(File file) {
+		List<File> allFiles = new ArrayList<File>();
+		File[] files = file.listFiles();
+		if(files!=null) {
+			for(File f:files) {
+				if(f.getName().endsWith(".class")) {
+					allFiles.add(f);
+				}
+			}
+		}
+		searchFile(files, allFiles);
+		return allFiles;
+	}
+	/**
+	 * It can get all of the file about package
+	 * @param files the file objects
+	 * @param allFiles the package file
+	 */
+	private void searchFile(File[] files,List<File> allFiles) {
+		if(files!=null) {
+			for(File f:files) {
+				if(f.isDirectory()){
+					allFiles.add(f);
+					File[] files2 = f.listFiles();
+					searchFile(files2, allFiles);
 				}
 			}
 		}
