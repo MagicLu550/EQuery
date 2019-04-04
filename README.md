@@ -2,7 +2,9 @@
 
 ![avatar](logo.jpeg)
 
-[chinese] chinese.md
+[chinese.md] To chinese.md
+
+
 ### * basic introduction
 * This `xml framework` simplifies the operation of the persistence layer configuration file and supports the object's IOC, which greatly simplifies the operation and is compatible with the usual `dom4j` operation, which allows the framework to be used in parallel with the traditional method (of course, the framework already provides The corresponding method, you must use the framework method to add elements, but these methods have a simplified operation of the framework, there are original operations. Because adding elements in the framework can register elements to the mapping factory, and is compatible with the operation of the selector) And added a selector function, a complete element selection mechanism, selector:: with 6 major features::
 `Dynamic creation (DC) ` `concurrent read and write (RW) ` `reverse control (RPC) ` `automatic assembly (AA) ` ` select conversion (SC) ` `object pool (OP) ` `search package instance ( SPI)`
@@ -144,3 +146,131 @@ So configured
 <xml>
 <file name="default"></file>
 <root name="root" ></root>
+<is-sync state="false"></is-sync>
+</xml>
+</xml-instance>
+```
+
+Only need to use after
+```java
+XMLDomFile xdf = InstanceQueryer.getXMLQuery("default",this);
+```
+Get the object
+HOW TO USE EPATH
+> How to select a language using epath xml
+* epath is divided into 5 language structures:
+Wildcard expression
+The wildcard expression has a keyword: the all keyword, which can be used to get all the Element objects.
+2. One-dimensional expression
+```xml
+The expression syntax:
+Other [selector type]
+
+The selector type is an auxiliary selection type with the following auxiliary selection types.
+One Select an example: a[0].b[0] [one];
+Elements select multiple a[0].b[0].c [elements];
+On selects the top element of the element (same level)
+ a[0].b[0].c[0] [on];
+Under select one of the elements below this element (same level)
+a[0].b[0].c[0] [under];
+Ons selects all elements above the element (same level)
+a[0].b[0].c[0] [ons];
+Unders selects all elements below this element (same level)
+a[0].b[0].c[0] [unders];
+Friends select all sibling elements a[0].b[0].c[0] [friends];
+Ids selects the element IDVALUE [ids] by the ID attribute;
+E_name selects ELEMENTNAME [e_name] by the name of the element element;
+Text Select ELEMENTTEXT [text];
+Parent gets the parent element a[0].b[0].c[0] [parent]
+Name Get the element by name name [name]
+Case:
+<root>
+<a>
+<b></b>
+<b></b>
+</a>
+</root>
+Select the element with the name a:
+a [name]
+
+```
+3. Two-dimensional expression
+```xml
+The expression syntax:
+Path/name middle [middleType];
+Middle is an attachment selection limit, and middleType is an attachment selection restriction type.
+There are the following subsidiary selection restriction types:
+Text Select element by text and path a[0].b[0].c[0] ExampleText [text];
+Namespace selects the element by namespace a[0].b[0].c[0] prefix,uri [namespace];
+Key is selected by the attribute key and supports multiple keys a[0].b[0].c[0] key1, key2, key3 [key];
+Value is selected by the value of the attribute, supporting multiple values ​​a[0].b[0].c[0] value1, value2 [value];
+Key=value is selected by the attribute and value of the attribute, supporting multiple keys and values ​​a[0].b[0].c[0] key1=value1,key2=value2 [key=value];
+Key,only Select by the attribute of the attribute, where the role of the only keyword is to obtain the element of the element must correspond to the specified key one by one, without adding, as long as the specified is required, the syntax is the same as above
+Value,only Same as above
+Text, name is selected by the name of text and element, a exmapleText [text, name];
+Uri queries through the URI of the namespace a[0].b[0].c[0] prefix [prefix];
+Prefix queries through the prefix of the namespace a[0].b[0].c[0] uri [uri];
+```
+4. Multidimensional expressions
+```
+Multidimensional expressions can query more complex conditions, where keywords can be spliced ​​at will, except
+Grammar:
+? is optional
+Path/name middle... [name/path,?only,middleType...]
+The name and only keywords must be in front, and the name is in front of only
+Key here
+Path
+Name
+Namespace
+Prefix
+Uri
+Only
+Key
+Value
+Basically the same
+```
+5. Keywords
+```
+One elements on under ons unders friends ids e_name text parent name
+Context key value only uri prefix path
+```
+
+The final reminder is that you must use the maven project to import the plugin. Finally, the configuration file is in the src/main/resources/ directory. You need to copy the configuration file to your directory.
+
+How to import the plugin?
+```xml
+<!-- link jar --!>
+<dependency>
+  <groupId>net.noyark</groupId>
+  <artifactId>equery-framework</artifactId>
+  <version>0.3.0</version>
+</dependency>
+<!--Link private service-->
+<repositories>
+ <repository>
+    <id>nexus</id>
+    <name>Team Neux Repository</name><url>http://www.noyark.net:8081/nexus/content/groups/public/</url>
+</repositories>
+<pluginRepositories>
+    <pluginRepository>
+      <id>nexus</id>
+      <name>Team Neux Repository</name>
+      <url>http://1www.noyark.net:8081/nexus/content/groups/public/</url>
+    </pluginRepository>
+ </pluginRepositories>
+
+```
+
+web: [web]
+
+doc: [doc]
+
+maven: [maven]
+
+[web]: http://magic.noyark.net
+
+[doc]: http://sxml.noyark.net
+
+[maven]: http://www.noyark.net:8081/nexus
+
+[chinese.md]: chinese.md
