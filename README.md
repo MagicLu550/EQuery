@@ -239,7 +239,7 @@ The final reminder is that you must use the maven project to import the plugin. 
 
 How to import the plugin?
 ```xml
-<!-- link jar --!>
+<!-- link jar -->
 <dependency>
   <groupId>net.noyark</groupId>
   <artifactId>equery-framework</artifactId>
