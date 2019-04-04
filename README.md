@@ -215,6 +215,80 @@ Add the following to pom.xml and install the configuration file to use
 ```
 The path to the driver load configuration file is set in the driver. The database must have .properties other without suffix. Starting from 028, define the configuration file path and driver information with driver.properties.
 
+# NEW: EPATH Select Language
+HOW TO USE EPATH
+> How to select a language using epath xml
+* epath is divided into 5 language structures:
+Wildcard expression
+The wildcard expression has a keyword: the all keyword, which can be used to get all the Element objects.
+2. One-dimensional expression
+```xml
+The expression syntax:
+Other [selector type]
+The selector type is an auxiliary selection type with the following auxiliary selection types.
+One Select an example: a[0].b[0] [one];
+Elements select multiple a[0].b[0].c [elements];
+On selects the upper element of the element (same level) a[0].b[0].c[0] [on];
+Under selects the following element of the element (same level a[0].b[0].c[0] [under];
+Ons selects all elements above the element (same level) a[0].b[0].c[0] [ons];
+Unders selects all elements below the element (same level) a[0].b[0].c[0] [unders];
+Friends select all sibling elements a[0].b[0].c[0] [friends];
+Ids selects the element IDVALUE [ids] by the ID attribute;
+E_name selects ELEMENTNAME [e_name] by the name of the element element;
+Text Select ELEMENTTEXT [text];
+Parent gets the parent element a[0].b[0].c[0] [parent]
+Name Get the element by name name [name]
+Case:
+<root>
+<a>
+<b></b>
+<b></b>
+</a>
+</root>
+Select the element with the name a:
+a [name]
+
+```
+3. Two-dimensional expression
+```xml
+The expression syntax:
+Path/name middle [middleType];
+Middle is an attachment selection limit, and middleType is an attachment selection restriction type.
+There are the following subsidiary selection restriction types:
+Text Select element by text and path a[0].b[0].c[0] ExampleText [text];
+Namespace selects the element by namespace a[0].b[0].c[0] prefix,uri [namespace];
+Key is selected by the attribute key and supports multiple keys a[0].b[0].c[0] key1, key2, key3 [key];
+Value is selected by the value of the attribute, supporting multiple values ​​a[0].b[0].c[0] value1, value2 [value];
+Key=value is selected by the attribute and value of the attribute, supporting multiple keys and values ​​a[0].b[0].c[0] key1=value1,key2=value2 [key=value];
+Key,only Select by the attribute of the attribute, where the role of the only keyword is to obtain the element of the element must correspond to the specified key one by one, without adding, as long as the specified is required, the syntax is the same as above
+Value,only Same as above
+Text, name is selected by the name of text and element, a exmapleText [text, name];
+Uri queries through the URI of the namespace a[0].b[0].c[0] prefix [prefix];
+Prefix queries through the prefix of the namespace a[0].b[0].c[0] uri [uri];
+```
+4. Multidimensional expressions
+```
+Multidimensional expressions can query more complex conditions, where keywords can be spliced ​​at will, except
+Grammar:
+? is optional
+Path/name middle... [name/path,?only,middleType...]
+The name and only keywords must be in front, and the name is in front of only
+Key here
+Path
+Name
+Namespace
+Prefix
+Uri
+Only
+Key
+Value
+Basically the same
+```
+5. Keywords
+```
+One elements on under ons unders friends ids e_name text parent name
+Context key value only uri prefix path
+```
 ### * 基本介绍
 * 这个xml框架简化了持久层配置文件的操作，并支持对象的IOC,大大简化了操作，同时兼容平常dom4j的操作，可以使框架与传统方式并行使用(当然，框架里面已经提供了相应的方法，必须使用框架的方法添加元素，但这些方法里面有框架的简化操作，也有原有的操作。因为在框架添加元素才能将元素注册到映射工厂，并兼容选择器的操作)，并且添加了选择器功能，有完善的元素选择机制，选择器::具备6大特性:: 
 动态创建（DC） 兼同读写(RW) 反路控制(RPC) 自动装配（AA） 选择转换（SC）　对象池（OP），搜包实例（SPI）
@@ -417,7 +491,80 @@ XMLDomFile xdf = InstanceQueryer.getXMLQuery("a.xml","root","www.noyark.net/xmln
 </pluginRepositories>
 ```
 驱动加载配置文件的路径都在driver里设置，关于数据库的必须带.properties其他可以不加后缀，自028版本开始，以driver.properties定义配置文件路径和驱动信息
-
+# NEW： EPATH 选择语言
+	HOW TO USE EPATH
+> 如何使用epath xml选择语言
+* epath分为5个语言结构：
+1. 通配表达式
+	通配表达式有一个关键字:all关键字，使用该关键字可以获取全部的Element对象
+2. 一维表达式
+```xml
+	该表达式语法:
+		other [selector type]
+	selector type是附属选择类型，有以下附属选择类型
+	one 选择一个 示例:										a[0].b[0] [one];
+	elements 选择多个 				  					a[0].b[0].c [elements];
+	on 选择该元素的上面的一个元素(同级) 			a[0].b[0].c[0] [on];
+	under 选择该元素的下面的一个元素(同级		a[0].b[0].c[0] [under];
+	ons 选择该元素的上面的全部元素(同级) 		a[0].b[0].c[0] [ons];
+	unders 选择该元素的下面的全部元素(同级) 	a[0].b[0].c[0] [unders];
+	friends 选择全部同级元素                       	a[0].b[0].c[0] [friends];
+	ids			通过ID属性选择元素 					IDVALUE [ids];					
+	e_name  通过element元素的名字选择 		ELEMENTNAME	[e_name];
+	text    通过element对象的text选择 		ELEMENTTEXT [text];
+	parent	获取父元素									a[0].b[0].c[0] [parent]
+	name		通过名字获取元素							name [name]
+	案例:
+	<root>
+		<a>
+			<b></b>
+			<b></b>
+		</a>
+	</root>
+	选择名字为a的元素:
+		a [name]
+	
+```
+3. .二维表达式
+```xml
+	该表达式语法:
+		path/name middle [middleType];
+	middle是附属选择限制，middleType是附属选择限制类型
+	有以下附属选择限制类型:
+		text			通过text和path进行选择元素		a[0].b[0].c[0] ExampleText [text];
+		namespace	通过namespace进行选择元素		a[0].b[0].c[0] prefix,uri [namespace];
+		key 通过attribute的key进行选择，支持多个key	a[0].b[0].c[0] key1,key2,key3 [key];
+		value	通过attribute的value进行选择，支持多个value a[0].b[0].c[0] value1,value2 [value];
+		key=value 通过attribute的key和value进行选择，支持多个key和value a[0].b[0].c[0] key1=value1,key2=value2 [key=value];
+		key,only 通过attribute的key进行选择，这里only关键字的作用是获得element的元素必须和规定的key一一对应，不加only,则只要含有规定的即可 ，语法同上
+		value,only 同上	
+		text,name 通过text和element的name进行选择，a exmapleText [text,name];
+		uri 通过命名空间的uri进行查询	 a[0].b[0].c[0] prefix [prefix];	 
+		prefix 通过命名空间的prefix进行查询 a[0].b[0].c[0] uri [uri];
+```
+4. 多维表达式
+```
+	多维表达式可以查询更为复杂的条件,这里关键字基本可以随意拼接，除了
+	语法:
+	?为可有可无
+	path/name middle... [name/path,?only,middleType...]
+	name和only关键字必须在前面，且name在only前面
+	这里的关键字
+	path
+	name
+	namespace
+	prefix
+	uri
+	only
+	key
+	value
+	基本作用相同
+```
+5. 关键字
+```
+	one elements on under ons unders friends ids e_name text parent name
+	namespace key value only uri prefix path  
+```
 the doc web：[doc][3]
 
 my web: [web][2]
