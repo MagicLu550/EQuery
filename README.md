@@ -255,6 +255,6 @@ How to import the plugin?
  </pluginRepositories>
 
 ```
-> web: ![web](http://blog.noyark.net)
-> doc: ![doc](http://sxml.noyark.net)
-> maven: ![maven](http://www.noyark.net:8081/nexus)
+> web: ![web](http://blog.noyark.net "web")
+> doc: ![doc](http://sxml.noyark.net "doc")
+> maven: ![maven](http://www.noyark.net:8081/nexus "maven")
