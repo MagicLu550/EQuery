@@ -1,6 +1,6 @@
 ![master](https://travis-ci.org/MagicLu550/EQuery.svg?branch=master)
 ![avatar](logo.jpeg)
-> ![chinese](chinese.md)
+[4] chinese.md
 ### * basic introduction
 * This `xml framework` simplifies the operation of the persistence layer configuration file and supports the object's IOC, which greatly simplifies the operation and is compatible with the usual `dom4j` operation, which allows the framework to be used in parallel with the traditional method (of course, the framework already provides The corresponding method, you must use the framework method to add elements, but these methods have a simplified operation of the framework, there are original operations. Because adding elements in the framework can register elements to the mapping factory, and is compatible with the operation of the selector) And added a selector function, a complete element selection mechanism, selector:: with 6 major features::
 `Dynamic creation (DC) ` `concurrent read and write (RW) ` `reverse control (RPC) ` `automatic assembly (AA) ` ` select conversion (SC) ` `object pool (OP) ` `search package instance ( SPI)`
@@ -255,10 +255,13 @@ How to import the plugin?
  </pluginRepositories>
 
 ```
->*web: [1]
->*doc: [2]
->*maven: [3]
+web: [1]
 
-[1] http://blog.noyark.net "web"
-[2] http://sxml.noyark.net "doc"
-[3] http://www.noyark.net:8081/nexus "maven"
+doc: [2]
+
+maven: [3]
+
+[1]: http://blog.noyark.net "web"
+[2]: http://sxml.noyark.net "doc"
+[3]: http://www.noyark.net:8081/nexus "maven"
+[4]: chinese.md
