@@ -1,9 +1,9 @@
-![avatar](ui.jpeg)
+
 ![avatar](logo.jpeg)
 # *EQuery 029 final*
 ## The Java xml framework based on dom4j
 ### the basic introduction
-* This xml framework simplifies the operation of the persistence layer configuration file and supports the object's IOC, which greatly simplifies the operation and is compatible with the usual dom4j operations. It can be used in parallel with the traditional method (of course, the corresponding method has been provided in the framework. You must use the methods of the framework to add elements, but these methods have simplified operations on the framework, as well as the original operation. Because the elements are added to the framework to register the elements to the mapping factory and are compatible with the operation of the selector, and the selector is added. Function, complete element selection mechanism, selector ::with *  6 features *:: ：
+* This `xml framework` simplifies the operation of the persistence layer configuration file and supports the object's IOC, which greatly simplifies the operation and is compatible with the usual dom4j operations. It can be used in parallel with the traditional method (of course, the corresponding method has been provided in the framework. You must use the methods of the framework to add elements, but these methods have simplified operations on the framework, as well as the original operation. Because the elements are added to the framework to register the elements to the mapping factory and are compatible with the operation of the selector, and the selector is added. Function, complete element selection mechanism, selector ::with *  6 features *:: ：
 dynamic creation (DC) combined with read and write (RW) reflection path control (RPC) automatic assembly (AA) selection and converter (SC) object pool (OP) , search package instance (SPI)
 * DC:
  Chinese (::动态创建::), meaning that objects can be created dynamically and created according to various forms of configuration files, which is very flexible
