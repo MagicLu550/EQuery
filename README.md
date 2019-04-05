@@ -3,7 +3,7 @@
 ![LICENSE](https://img.shields.io/badge/license-Noyark-green.svg)
 ![LICENSE](https://img.shields.io/badge/version-0.3.0NEW-blue.svg)
 
-![master](http://www.noyark.net/success.avg)
+![master](	https://img.shields.io/gitlab/pipeline/:user/:repo.svg)
 
 ![avatar](logo.jpeg)
 
