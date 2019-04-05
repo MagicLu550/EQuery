@@ -3,10 +3,9 @@
 [![LICENSE](https://img.shields.io/badge/license-Noyark-green.svg)](NoyarkLICENSE)
 ![LICENSE](https://img.shields.io/badge/version-0.3.0NEW-blue.svg)
 ![master](https://img.shields.io/badge/build-passing-green.svg)
-
+[![zh](https://img.shields.io/badge/readme-chinese-orange.svg)](chinese.md)
 ![avatar](logo.jpeg)
 
-[chinese.md] To chinese.md
 
 
 ### * basic introduction
