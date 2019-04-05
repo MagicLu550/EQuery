@@ -3,7 +3,7 @@
 ![LICENSE](https://img.shields.io/badge/license-Noyark-green.svg)
 ![LICENSE](https://img.shields.io/badge/version-0.3.0NEW-blue.svg)
 
-![master](https://travis-ci.org/MagicLu550/EQuery.svg?branch=master)
+![master](http://www.noyark.net/success.avg)
 
 ![avatar](logo.jpeg)
 
