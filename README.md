@@ -1,6 +1,6 @@
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
-[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](996.icu)
-![LICENSE](https://img.shields.io/badge/license-Noyark-green.svg)
+[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](996.ICU LICENSE)
+[![LICENSE](https://img.shields.io/badge/license-Noyark-green.svg)](Noyark LICENSE.md)
 ![LICENSE](https://img.shields.io/badge/version-0.3.0NEW-blue.svg)
 ![master](https://img.shields.io/badge/build-passing-green.svg)
 
