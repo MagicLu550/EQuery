@@ -1,3 +1,4 @@
+[996.ICU](https://996.icu)
 ![master](https://travis-ci.org/MagicLu550/EQuery.svg?branch=master)
 
 ![avatar](logo.jpeg)
