@@ -109,15 +109,16 @@ public class DefaultDocument extends XMLDocument implements DefaultFile{
 	@Override
 	public List<Element> getElementsByAttribut(String name) {
 		List<Element> list = getAllElements();
+		List<Element> that = new ArrayList<Element>();
 		for(Element e:list) {
 			List<Attribute> attributes = e.attributes();
 			for(Attribute a:attributes) {
 				if(a.getName().equals(name)) {
-					list.add(e);
+					that.add(e);
 				}
 			}
 		}
-		return list;
+		return that;
 	}
 	/**
 	 * <p>
@@ -132,17 +133,18 @@ public class DefaultDocument extends XMLDocument implements DefaultFile{
 	@Override
 	public List<Element> getElementsByAttribut(String name,String value) {
 		List<Element> list = getAllElements();
+		List<Element> that = new ArrayList<Element>();
 		for(int i = 0;i<list.size();i++) {
 			List<Attribute> attributes = list.get(i).attributes();
 			for(Attribute a:attributes) {
 				if(a.getName().equals(name)) {
 					if(a.getValue().equals(value)) {
-						list.add(list.get(i));
+						that.add(list.get(i));
 					}
 				}
 			}
 		}
-		return list;
+		return that;
 	}
 	/**
 	 * <p>
