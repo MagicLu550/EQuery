@@ -98,7 +98,7 @@ addelements:同addElements的功能,不需要indexs属性
 
  public String[] absd = {"1","2","3"};
 
-//注意数组只支持String[]类型
+//031版本开始，支持全部数组类型
 ```
 ```java
 /*
