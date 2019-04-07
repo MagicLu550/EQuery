@@ -985,7 +985,7 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 * @return the element object set
 	 */
 	public List<Element> getElementsByNameSpace(String prefix,String uri){
-		List<Element> all = getAllElement();
+		List<Element> all = getAllElements();
 		List<Element> byNameSpace = new ArrayList<>();
 		for(Element e:all) {
 			Namespace namespace = e.getNamespace();
@@ -1004,17 +1004,18 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 * @return the element objects set
 	 */
 	public List<Element> getElementsByNameSpace(String uriOrprefix,boolean isURI){
-		List<Element> all = getAllElement();
+		List<Element> all = getAllElements();
 		List<Element> byNameSpace = new ArrayList<>();
 		for(Element e:all) {
 			Namespace namespace;
 			if(isURI) {
-				namespace = e.getNamespaceForURI(uriOrprefix);
+				if(e.getNamespaceURI().equals(uriOrprefix)) {
+					byNameSpace.add(e);
+				}
 			}else {
-				namespace = e.getNamespaceForPrefix(uriOrprefix);
-			}
-			if(namespace!=null) {
-				byNameSpace.add(e);
+				if(e.getNamespacePrefix().equals(uriOrprefix)) {
+					byNameSpace.add(e);
+				}
 			}
 		}
 		return byNameSpace;

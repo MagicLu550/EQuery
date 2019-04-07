@@ -26,9 +26,8 @@ public class TestCase{
 	//TODO XSD文件
 	@RuntimeTest
 	public void Test() throws Exception{
-		Core.start();
-		XMLDomFile xdf = InstanceQueryer.getXMLQuery("x.xml",true);
-		System.out.println(xdf);
+		XMLDomFile xdf = InstanceQueryer.getDefaultXml("classpath:noyark.xml",true);
+		System.out.println(xdf.getElementsByNameSpace("http://www.noyark.net:8081/util",true));
 	}
 	@RuntimeAfter
 	public void dead() {

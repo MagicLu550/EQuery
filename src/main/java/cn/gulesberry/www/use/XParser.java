@@ -60,7 +60,6 @@ public class XParser implements Parser{
 		for(Field f:field) {
 			Annotation[] annotations = f.getAnnotations();
 			for(Annotation annotation:annotations) {
-				
 				if(annotation instanceof Path) {
 					Path path = (Path)annotation;
 					String elementPath = path.path();
@@ -73,11 +72,7 @@ public class XParser implements Parser{
 					int[] indexs = path.indexs();
 					String text;
 					if(f.getType().isArray()) {
-						if(f.getType().equals(String[].class)) {
-							text = Arrays.toString((String[])f.get(o));
-						}else {
-							throw new ClassCastException("it can't support this Type of data");
-						}
+						text = Arrays.toString((Object[])f.get(o));
 					}else {
 						text = f.get(o)+"";
 					}
