@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.noyark.net:8081" 
+xmlns:util="http://www.noyark.net:8081/util" 
+xmlns:context="http://www.noyark.net:8081/context"
+xmlns:mapper="http://www.noyark.net:8081/noyarkDB/mapper">
+<context:component-scan base-package="net.noyark.www"></context:component-scan>
+<util:properties id="dbConfig" location="classpath:properties/applicationConnection.properties"/>
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">  
+    <property name="driverClassName" value="#{dbConfig.driver}" />  
+    <property name="url"  
+        value="#{dbConfig.url}" />  
+    <property name="username" value="#{dbConfig.username}" />  
+    <property name="password" value="#{dbConfig.password}" />  
+</bean>  
+<mapper:mappers  file="classpath:mapper/*.xml" source="source"/>
+
+</beans>
+<!-- 
+	自动装配，注解，包扫描
+ -->

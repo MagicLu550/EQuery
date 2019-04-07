@@ -132,12 +132,12 @@ public class DefaultDocument extends XMLDocument implements DefaultFile{
 	@Override
 	public List<Element> getElementsByAttribut(String name,String value) {
 		List<Element> list = getAllElements();
-		for(Element e:list) {
-			List<Attribute> attributes = e.attributes();
+		for(int i = 0;i<list.size();i++) {
+			List<Attribute> attributes = list.get(i).attributes();
 			for(Attribute a:attributes) {
 				if(a.getName().equals(name)) {
 					if(a.getValue().equals(value)) {
-						list.add(e);
+						list.add(list.get(i));
 					}
 				}
 			}
