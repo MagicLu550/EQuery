@@ -244,7 +244,7 @@ HOW TO USE EPATH
 <dependency>
   <groupId>net.noyark</groupId>
   <artifactId>equery-framework</artifactId>
-  <version>0.3.1.1</version>
+  <version>0.3.1.2</version>
 </dependency>
 <!--链接私服-->
 <repositories>
