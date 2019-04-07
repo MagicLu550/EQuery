@@ -246,7 +246,7 @@ How to import the plugin?
 <dependency>
   <groupId>net.noyark</groupId>
   <artifactId>equery-framework</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.1.1</version>
 </dependency>
 <!--Link private service-->
 <repositories>
