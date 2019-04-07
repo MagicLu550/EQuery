@@ -100,7 +100,7 @@ Case:
 
  Public String[] absd = {"1","2","3"};
 
-/ / Note that the array only supports the String[] type
+/ / Starting with version 031, support for all array types
 ```
 ```java
 /*
