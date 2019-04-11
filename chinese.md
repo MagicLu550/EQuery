@@ -157,33 +157,49 @@ public class Test extends ReadingXML{
 XMLDomFile xdf = InstanceQueryer.getXMLQuery("default",this);
 ```
 获取对象即可
-HOW TO USE EPATH
-> 如何使用epath xml选择语言
-* epath分为5个语言结构：
-1. 通配表达式
-	通配表达式有一个关键字:all关键字，使用该关键字可以获取全部的Element对象
-2. 一维表达式
-```xml
+# 如何使用epath xml选择语言
+## epath分为5个语言结构：
+```
+从0.0.2版本开始，空格换成with代替，即：
+select  in a with [name];
+或者select in a with name;
+```
+### 1.通配表达式
+```
+	通配表达式有两个关键字:all和root关键字，使用all关键字可以获取全部的非根Element对象
+	root关键字可以获取根节点
+	all和root结合:all,root 获取全部节点
+```
+### 2.一维表达式
+```
+一维表达式是由值和组组成，又称为单组表达式，单叠表达式，描述一维表达式需要with关键字连接，
+ 基本语法是:select in value group
+ 以下写法也可以:
+ select in value [group]
+ 单组表达式有13个组关键字，组关键字是用于描述value所标示的特征信息，(或者是类型)
+ 单组表达式的关键字称为单组关键字，这里大部分关键字只在单组表达式使用
+ 单组表达式关键字:
+ one elements on under ons unders friends ids e_name text parent
+ name *path
 	该表达式语法:
 		other [selector type]
-
 	selector type是附属选择类型，有以下附属选择类型
+	
 	one 选择一个 示例:										a[0].b[0] [one];
 	elements 选择多个 				  					a[0].b[0].c [elements];
-	on 选择该元素的上面的一个元素(同级)
- 			a[0].b[0].c[0] [on];
-	under 选择该元素的下面的一个元素(同级)	
-	a[0].b[0].c[0] [under];
-	ons 选择该元素的上面的全部元素(同级) 
-		a[0].b[0].c[0] [ons];
-	unders 选择该元素的下面的全部元素(同级) 
-	a[0].b[0].c[0] [unders];
+	on 选择该元素的上面的一个元素(同级) 			a[0].b[0].c[0] [on];
+	under 选择该元素的下面的一个元素(同级		a[0].b[0].c[0] [under];
+	ons 选择该元素的上面的全部元素(同级) 		a[0].b[0].c[0] [ons];
+	unders 选择该元素的下面的全部元素(同级) 	a[0].b[0].c[0] [unders];
 	friends 选择全部同级元素                       	a[0].b[0].c[0] [friends];
 	ids			通过ID属性选择元素 					IDVALUE [ids];					
 	e_name  通过element元素的名字选择 		ELEMENTNAME	[e_name];
 	text    通过element对象的text选择 		ELEMENTTEXT [text];
 	parent	获取父元素									a[0].b[0].c[0] [parent]
 	name		通过名字获取元素							name [name]
+	*path 	通过元素指针获取元素,同时指针加1
+					参见getElementByIndexPointer
+					方法												a.b [*path]
 	案例:
 	<root>
 		<a>
@@ -193,10 +209,9 @@ HOW TO USE EPATH
 	</root>
 	选择名字为a的元素:
 		a [name]
-	
 ```
-3. .二维表达式
-```xml
+### 3.二维表达式
+```
 	该表达式语法:
 		path/name middle [middleType];
 	middle是附属选择限制，middleType是附属选择限制类型
@@ -212,14 +227,17 @@ HOW TO USE EPATH
 		uri 通过命名空间的uri进行查询	 a[0].b[0].c[0] prefix [prefix];	 
 		prefix 通过命名空间的prefix进行查询 a[0].b[0].c[0] uri [uri];
 ```
-4. 多维表达式
+### 4.多维表达式
 ```
 	多维表达式可以查询更为复杂的条件,这里关键字基本可以随意拼接，除了
 	语法:
 	?为可有可无
-	path/name middle... [name/path,?only,middleType...]
-	name和only关键字必须在前面，且name在only前面
+	all/path/name middle... [all/name/path,?only,middleType...]
+	name和only关键字,regex系列必须在前面，且name在only前面,regex不限制
 	这里的关键字
+	textRegex【是否启用text的正则表达式】
+	attrRegex【是否启用key或者value，单个key=value的正则表达式，目前不支持多key=value的正则】
+	all
 	path
 	name
 	namespace
@@ -229,12 +247,90 @@ HOW TO USE EPATH
 	key
 	value
 	基本作用相同
+select in path with namespace with key with [path,namespace,key]
 ```
-5. 关键字
+### 5.with关键字
 ```
-	one elements on under ons unders friends ids e_name text parent name
-	namespace key value only uri prefix path  
+with关键字和空格作用相同，用于分割语法，自epath 002	更新，从此保证了语法自由性
+同时，epath语法规定，空格和with不能共存
+such as:a[0].b[0] with [one]
 ```
+### 6.前缀词,
+```
+select in 可有可无，可以有大括号
+select in {a[0].b[0] with [one]}
+```
+### 7.none关键字
+```
+select in{all with none with a with [all,only,attrRegex,none,key]}
+这句话其实是从全部元素中以正则为标准查找a名字元素
+```
+### 8.指针掉头
+```
+seek in path to index可以实现指针掉头
+如:
+seek in a.b to 0;
+```
+### 9.epathshell
+#### EPATHSHELL规定必须使用with
+```
+调用Core.startEPathShell();
+就可以在控制台使用epath代码
+epath shell指令:
+source to 导入epath文件
+use in 替换读取文件
+exit();退出程序
+print 打印对象,可以通过print直接打印函数,或者打印一个表达式的结果以及字符串(用""或者''包围,不支持拼接);
+alias<name> (on) select in...为查询到的元素对象集合起别名，可以在接下来语句使用
+select in alias name 通过别名查询元素集合
+print select in alias name
+... 
+pathes获取路径
+indexs获取坐标
+两个一起使用获取路径和坐标
+such as:print select in pathes with indexs with *;
+定义函数:func name (a,b,c){
+select in <a> with <b> with <c>
+};
+?:表达式，前面为布尔表达式，后面为两个代码段,当为true,则执行前面，当为false
+执行后面
+同时，这里规定了布尔表达式
+sizebig sizesmall == !empty empty
+sizebig 左边大于右边a sizebig b
+sizesmall 左边小于右边a sizesmall b
+== 元素完全相等 a == b
+!empty 不是空的 a !empty
+empty 是空的 a empty
+目前不支持嵌套
+导入函数库
+sh 函数库文件路径
+```
+### 10.函数对象
+```
+自带方法：excute()方法，
+可以在声明函数同时立即执行，但不支持复杂语句的立即执行
+逻辑判断和存储变量不支持立即执行
+```
+### 11.原生函数表
+```
+目前原生函数有
+exit函数
+excute函数
+...
+```
+### 12.运算符[epath只支持原生语句]
+```
+逻辑运算符：sizebig sizesmall == !empty empty 
+函数运算符：in to 
+逻辑控制符：?: (select in *==select in * ?print "1":print "2")
+导入符：sh (filename) source (to filename) use (in filename)
+连接符： (a) with (b)
+同级多分割符：,
+查询符：select (in)
+输出符：print (select in .../""/'')
+内存导入符：alias<> func (name(){};)
+内存导出符：select in alias (name),name();
+````
 
 最终需要提醒的是，您必须使用maven项目导入该插件，最后，配置文件在src/main/resources/目录，您需要将里面配置文件复制到您的目录下即可.
 
