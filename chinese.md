@@ -331,7 +331,20 @@ excute函数
 内存导入符：alias<> func (name(){};)
 内存导出符：select in alias (name),name();
 ````
-
+### 13.脚本文件
+```
+epath脚本文件是.epath后缀文件，通过source to导入，注意该导入只支持epath语法
+select in *;
+select in a with name;
+epath shell 函数脚本文件是.func，通过sh导入，注意该导入支持epath shell和epath语法，并且代码段必须以函数分割
+#epath shell equery.func
+func test(){
+select in *;
+};
+func test1(){
+select in * == select in *?print "1":print '2';
+};
+```
 最终需要提醒的是，您必须使用maven项目导入该插件，最后，配置文件在src/main/resources/目录，您需要将里面配置文件复制到您的目录下即可.
 
 如何导入该插件？
