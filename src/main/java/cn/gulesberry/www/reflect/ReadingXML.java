@@ -103,6 +103,7 @@ public abstract class ReadingXML {
 		xMl = InstanceQueryer.getDefaultXml(file,this);
 		setObject(getObject());
 	}
+	@Deprecated
 	public ReadingXML(String file,InputStream in) throws DocumentException, IllegalMappingException, IndexLengthException, IOException, IllegalArgumentException, IllegalAccessException {
 		this();
 		xMl = InstanceQueryer.getDefaultXml(file,in);

@@ -25,6 +25,9 @@
  */
 package cn.gulesberry.www.core;
 
+import cn.gulesberry.www.exception.IllegalMappingException;
+import cn.gulesberry.www.exception.IndexLengthException;
+import cn.gulesberry.www.use.StartFactory;
 import net.noyark.www.annotations.Start;
 import net.noyark.www.interf.Queryer;
 /**
@@ -37,29 +40,35 @@ import net.noyark.www.interf.Queryer;
  * @since EQuery 026
  */
 @Start(Queryer.class)
-public class Core {
-	/**This is the EQuery instance
-	 * */
-	private static Queryer queryer;
+public class Core implements CoreBase{
+	
 	/**
-	 * if you start first,must use this method.
+	 * if you start,must use this method.
 	 * @param getVersion {@link EQuery#EQuery(boolean, String)}
 	 * @param xmlStartFile {@link EQuery#EQuery(boolean, String)}
 	 * @return the Queryer instance;
 	 * @see EQuery#EQuery(boolean, String)
 	 */
 	public static Queryer start() {
-		if(queryer!=null) {
-			return queryer;
-		}
-		queryer = new EQuery();
-		return queryer;
+		return QUERY;
 	}
 	/**
 	 * @see Queryer#close()
 	 * @see EQuery#close()
 	 */
 	public static void close() {
-		queryer.close();
+		QUERY.close();
+	}
+	/**
+	 * you can use this method startEpathShell in console
+	 */
+	public static void startEPathShell() {
+		new Thread(()->{
+			try {
+				StartFactory.getApplication();
+			} catch (IllegalMappingException | IndexLengthException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 }

@@ -29,7 +29,7 @@
   <modelVersion>4.0.0</modelVersion>  
   <dependencies> 
     <dependency> 
-      <groupId>dom4j</groupId>  
+      <groupId>dom4j</groupId> 
       <artifactId>dom4j</artifactId>  
       <version>1.6.1</version> 
     </dependency>  
@@ -58,7 +58,7 @@
     </repository> 
   </repositories>  
   <groupId>net.noyark</groupId>  
-  <version>0.3.1.1</version>  
+  <version>0.3.2</version>  
   <name>Simple XML for Java [use dom4j] by Noyark-System</name>  
   <url>http://sxml.noyark.net</url>  
   <organization> 
@@ -72,12 +72,12 @@
   </scm>  
   <inceptionYear>2019</inceptionYear>  
   <properties> 
-    <version>0.3.1.1</version>  
+    <version>0.3.2</version>  
     <author>MagicLu550&amp;&amp;K.J</author> 
   </properties>  
   <issueManagement> 
-    <url>https://github.com/MagicLu550/SimpleXML/tree/master/src/main/java/cn/gulesberry/www/utils</url> 
+    <url>https://github.com/MagicLu550/EQuery-framework</url> 
   </issueManagement>  
   <artifactId>equery-framework</artifactId>  
-  <description>* WEB:&lt;a href=&quot;http://magic.noyark.net&quot;&gt;web&lt;/a&gt; * DOC:&lt;a href=&quot;http://sxml.noyark.net&quot;&gt;doc&lt;/a&gt; * implementation the &lt;code&gt;{@link net.noyark.www.inter.Queryer}&lt;/code&gt; * &lt;p&gt; * The &lt;code&gt;driver&lt;/code&gt; class of the api can detect * the version number and whether you have * installed the dependency library of this * api.It can automatically assemble the &lt;i&gt;dependency * library&lt;/i&gt; and read and write the corresponding * configuration folder to realize the hungry instantiation * &lt;/p&gt; * &lt;p&gt; * This xml framework simplifies the operation of the persistence * layer configuration file and supports the object's IOC, which greatly * simplifies the operation and is compatible with the usual dom4j operations. * It can be used in parallel with the traditional method (of course, the corresponding * method has been provided in the framework. You must use the methods of the framework * to add elements, but these methods have simplified operations on the framework, as well * as the original operation. Because the elements are added to the framework to register * elements to the mapping factory and are compatible with the operation of the selector, * and the selector is added. Function, complete element selection mechanism, selector * ::with * 6 features *:: ： * * &lt;P&gt;dynamic creation (DC) combined with read and write (RW) reflection path control (RPC) automatic assembly (AA) selection and * converter (SC) object pool (OP) * , search package instance (SPI) * &lt;P&gt;DC: meaning that objects can be created dynamically and created according to various forms of configuration files, * which is very flexible * &lt;P&gt;RW: means that it can be compatible with the newly added elements of the document that has been written, and will not * refresh the original created document. * &lt;P&gt;RPC: meaning the rules of the elements are created by path and reflection, thus simply adding elements * &lt;P&gt;AA: meaning that the maven dependencies can be automatically assembled by loading the framework driver. * &lt;P&gt;SC: built-in converter can convert dom4j Element object into SElement recording element geometry information, and then * used for selector hash query element * &lt;P&gt;OP: the object pool can store the original object, the previously created object can be reused * &lt;P&gt;SPI: through the package path of the configuration file, search for the class with annotations, instantiate the object according to the annotation, * and create the file at one time * &lt;/p&gt;</description> 
+  <description>* WEB:&lt;a href="http://magic.noyark.net"&gt;web&lt;/a&gt; * DOC:&lt;a href="http://sxml.noyark.net"&gt;doc&lt;/a&gt; * implementation the &lt;code&gt;{@link net.noyark.www.inter.Queryer}&lt;/code&gt; * &lt;p&gt; * The &lt;code&gt;driver&lt;/code&gt; class of the api can detect * the version number and whether you have * installed the dependency library of this * api.It can automatically assemble the &lt;i&gt;dependency * library&lt;/i&gt; and read and write the corresponding * configuration folder to realize the hungry instantiation * &lt;/p&gt; * &lt;p&gt; * This xml framework simplifies the operation of the persistence * layer configuration file and supports the object's IOC, which greatly * simplifies the operation and is compatible with the usual dom4j operations. * It can be used in parallel with the traditional method (of course, the corresponding * method has been provided in the framework. You must use the methods of the framework * to add elements, but these methods have simplified operations on the framework, as well * as the original operation. Because the elements are added to the framework to register * elements to the mapping factory and are compatible with the operation of the selector, * and the selector is added. Function, complete element selection mechanism, selector * ::with * 6 features *:: ： * * &lt;P&gt;dynamic creation (DC) combined with read and write (RW) reflection path control (RPC) automatic assembly (AA) selection and * converter (SC) object pool (OP) * , search package instance (SPI) * &lt;P&gt;DC: meaning that objects can be created dynamically and created according to various forms of configuration files, * which is very flexible * &lt;P&gt;RW: means that it can be compatible with the newly added elements of the document that has been written, and will not * refresh the original created document. * &lt;P&gt;RPC: meaning the rules of the elements are created by path and reflection, thus simply adding elements * &lt;P&gt;AA: meaning that the maven dependencies can be automatically assembled by loading the framework driver. * &lt;P&gt;SC: built-in converter can convert dom4j Element object into SElement recording element geometry information, and then * used for selector hash query element * &lt;P&gt;OP: the object pool can store the original object, the previously created object can be reused * &lt;P&gt;SPI: through the package path of the configuration file, search for the class with annotations, instantiate the object according to the annotation, * and create the file at one time * &lt;/p&gt;</description> 
 </project>

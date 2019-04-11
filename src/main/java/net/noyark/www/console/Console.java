@@ -28,6 +28,7 @@ package net.noyark.www.console;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
 /**
  * it can print in the console
@@ -35,21 +36,39 @@ import java.util.Date;
  * @see java.io.PrintStream#println(Object)
  */
 public class Console {
+	static Scanner scan;
+	static {
+		scan = new Scanner(System.in);
+	}
 	/**
 	 * like System.out.println
 	 * @param message
 	 * @see System#out
 	 */
-	public static void log(Object message) {
+	public synchronized static void log(Object message) {
 		System.out.println(message);
 	}
 	/**
 	 * the err print,with the date
 	 * @param message
 	 */
-	public static void err(Object message) {
+	public synchronized static void err(Object message) {
 		SimpleDateFormat format = new SimpleDateFormat("MM-HH:mm:ss");
 		String dateString0 = format.format(new Date());
-		System.err.println(dateString0+" message："+message);
+		System.err.println("\n"+dateString0+" message："+message);
+	}
+	/**
+	 * Input the console message
+	 * @return the input message
+	 */
+	public static String in() {
+		return scan.nextLine();
+	}
+	/**
+	 * @see System#out
+	 * @param o the console message
+	 */
+	public static void start(Object o) {
+		System.out.print(o);
 	}
 }

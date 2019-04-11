@@ -629,8 +629,11 @@ public final class XMLHelper {
 		switch(query) {
 		case ALL:
 			return xdf.getAllElements();
-		case BROTHER_UNDER:
+		case BROTHER_ON:
 			list.add(xdf.getBrotherElementOn(element,index));
+			return list;
+		case BROTHER_UNDER:
+			list.add(xdf.getBrotherElementUnder(element, index));
 			return list;
 		case BROTHERS_ON:
 			return xdf.getBrotherElementsOn(element,index);
@@ -676,6 +679,7 @@ public final class XMLHelper {
 	 * @param attributeName the attribute names
 	 * @return the element object list
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<Element> getThis(boolean b,List<Element> list,String[] attributeName) {
 		List<String> attributeNameList = Arrays.asList(attributeName);
 		List<Element> theElementsThatHave = new ArrayList<>();
@@ -697,6 +701,7 @@ public final class XMLHelper {
 	 * @param attributeName the attribute names
 	 * @return the element object list
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<Element> getElementsByNameStrict(List<Element> list,String[] attributeName) {
 		List<String> attributeNameList = Arrays.asList(attributeName);
 		List<Element> theElementsThatHave = new ArrayList<>();
@@ -711,5 +716,16 @@ public final class XMLHelper {
 			}
 		}
 		return theElementsThatHave;
+	}
+	/**
+	 * It can trim all of the text(String)
+	 * @param strings the String array
+	 * @return the string array that is trimed
+	 */
+	public static String[] trimAll(String[] array) {
+		for(int i = 0;i<array.length;i++) {
+			array[i] = array[i].trim();
+		}
+		return array;
 	}
 }

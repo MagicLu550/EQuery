@@ -77,7 +77,7 @@ import java.util.List;
  * @since JDK1.8
  * @since EQuery 019
  */
-public class InstanceQueryer {
+public interface InstanceQueryer{
 	/**
 	 * <p>
 	 * 	This method can be instantiated by the <i>object
@@ -92,7 +92,7 @@ public class InstanceQueryer {
 	 * @param isSync if you have two many thread,the best to 'true'
 	 * @return the File instance
 	 */
-	public static XMLDomFile getXMLQuery(String file,String rootElement,boolean isSync){
+	static XMLDomFile getXMLQuery(String file,String rootElement,boolean isSync){
 		if(isSync) {
 			synchronized (instancesPool) {
 				return getByGroup(file, rootElement);
@@ -116,7 +116,7 @@ public class InstanceQueryer {
 	 * @param isSync if you have two many thread,the best to 'true'
 	 * @return the File instance
 	 */
-	public static XMLDomFile getXMLQuery(String file,String rootElement,String url,boolean isSync) {
+	static XMLDomFile getXMLQuery(String file,String rootElement,String url,boolean isSync) {
 		if(isSync) {
 			synchronized (instancesPool) {
 				return getByGroupWithUrl(file, rootElement,url);
@@ -140,7 +140,7 @@ public class InstanceQueryer {
 	 * @return The File instance
 	 * @throws DocumentException if your document have some errors..
 	 */
-	public static XMLDomFile getXMLQuery(String file,boolean isSync) throws DocumentException {
+	static XMLDomFile getXMLQuery(String file,boolean isSync) throws DocumentException {
 		if(isSync) {
 			synchronized (instancesPool) {
 				return getByFile(file);
@@ -168,7 +168,7 @@ public class InstanceQueryer {
 	 * @throws IndexLengthException you can see the {@link cn.gulesberry.www.exception.IndexLengthException}
 	 * @throws IOException if your File is not found
 	 */
-	public static XMLDomFile getDefaultXml(String file,Object o,boolean... getStream) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
+	static XMLDomFile getDefaultXml(String file,Object o,boolean... getStream) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
 		List<Element> elements = new ArrayList<>();
 		SAXReader reader = new SAXReader();	
 		boolean isStream = false;
@@ -231,7 +231,7 @@ public class InstanceQueryer {
 	 * @throws IOException if your File is not found
 	 */
 	@Deprecated
-	public static XMLDomFile getDefaultXml(String file,InputStream stream) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
+	static XMLDomFile getDefaultXml(String file,InputStream stream) throws DocumentException, IllegalMappingException, IndexLengthException, IOException {
 		String classpath = (SetMavenJar.getInstance().getClass().getResource("/").getPath()+file).replaceAll("test-classes", "classes");
 		List<Element> elements = new ArrayList<>();	
 		XMLDocument xml = XMLHelper.getDefaultPoor(classpath);
@@ -271,7 +271,7 @@ public class InstanceQueryer {
 	 * @param root the root element name
 	 * @return The File instance
 	 */
-	public static XMLDomFile getAnyFile(String file,String root,String targetNamespace,String xmlnsTns) {
+	static XMLDomFile getAnyFile(String file,String root,String targetNamespace,String xmlnsTns) {
 		StringBuilder builder = new StringBuilder(file);
 		if(!"".equals(targetNamespace)&&"".equals(xmlnsTns)) {
 			if(!file.endsWith(".xsd")) {
@@ -304,10 +304,11 @@ public class InstanceQueryer {
 	 * 	you can get the inputstream that read the resources simply
 	 * </p>
 	 * @param file the file's name in the resources
+	 * @param o is always 'this'
 	 * @return the ClassLoaderInputStream
 	 */
-	public InputStream getStream(String file) {
-		return getClass().getClassLoader().getResourceAsStream(file);
+	static InputStream getStream(String file,Object o) {
+		return o.getClass().getClassLoader().getResourceAsStream(file);
 	}
 
 }

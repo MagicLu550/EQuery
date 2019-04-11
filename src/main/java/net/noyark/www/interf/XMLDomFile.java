@@ -80,6 +80,13 @@ import net.noyark.www.list.Query;
 *  @see cn.gulesberry.www.io.InitDocument
 */
 public interface XMLDomFile extends Serializable,Cloneable{
+	/**This is the POINT for Regular expression
+	 * */
+	String POINT = "\\u002E";
+	/**This is the SLASH for Regular expression
+	 * */
+	String SLASH = "/";
+	
 	/**
 	 *  <p>
 	 * The <code>addElement</code> method can add tags directly. The first tag is not the root tag.
@@ -1162,7 +1169,7 @@ public interface XMLDomFile extends Serializable,Cloneable{
 	 * to select elements,which is a simpler
 	 * version of xpath
 	 * <br>
-	 * EXPRESSIONS SYNTAX v001:
+	 * EXPRESSIONS SYNTAX v002:
 	 * <br>
 	 *	all element:
 	 * 	all;
@@ -1241,5 +1248,79 @@ public interface XMLDomFile extends Serializable,Cloneable{
 	 * @throws IndexLengthException 
 	 * @throws IllegalMappingException 
 	 */
-	NodeTable<Integer,Element> sourceEPathFile(String file) throws IOException, IllegalMappingException, IndexLengthException, DocumentException;
+	NodeTable<Integer,Element> sourceEPathFile(String file) 
+			throws IOException, 
+			IllegalMappingException, 
+			IndexLengthException, 
+			DocumentException;
+	/**
+	 * This method can get the elements by regex[the text regex]
+	 * you can see more at <code>getElementsByText</code>
+	 * @param textRegex the text regex
+	 * @return the element lists
+	 * @see XMLDocument#getElementsByText(String)
+	 */
+	public List<Element> getElementsByTextWithRegex(String textRegex);
+	/**
+	 * This method can get the elements by regex[the name regex]
+	 * you can see more at <code>getElementsByName</code>
+	 * @param nameRegex the name regex
+	 * @return the element list
+	 * @see XMLDocument#getElementsByName(String)
+	 */
+	public List<Element> getElementsByNameWithRegex(String nameRegex);
+	/**
+	 *  This method can get the elements by regex[the attribute name regex]
+	 * you can see more at <code>getElementsByAttributeName</code>
+	 * @param isOnly whether get elements by only these key
+	 * @param nameRegex the name regex
+	 * @return the elements list
+	 * @see XMLDocument#getElementsByAttributesAndName(String, String...)
+	 * @see XMLDocument#getElementsByAttributesAndNameOnlyThese(String, String...)
+	 * @see XMLDocument#getElementsByAttribut(String)
+	 * @see XMLDocument#getElementsByAttribut(String, String)
+	 */
+	public List<Element> getElementsByAttributeNameRegex(boolean isOnly,String... nameRegex);
+	/**
+	 * from default element list,select the elements by regex[element attribute value and key]
+	 * you can see more at <code>getElementsByAttribut</code>
+	 * @param key the attribute key regex
+	 * @param value the attribute value regex
+	 * @return the element list
+	 * @see XMLDocument#getElementsByAttributesAndName(String, String...)
+	 * @see XMLDocument#getElementsByAttributesAndNameOnlyThese(String, String...)
+	 * @see XMLDocument#getElementsByAttribut(String)
+	 * @see XMLDocument#getElementsByAttribut(String, String)
+	 */
+	public List<Element> getElementsByAttributeRegex(String key,String value);
+	/**
+	 * from default element list,select the elements by regex[element attribute value]
+	 * you can see more at <code>getElementsByAttribut</code>
+	 * @param isOnly  whether get elements by only these value
+	 * @param valueRegex the value regex
+	 * @return the element list
+	 * @see XMLDocument#getElementsByAttributesAndName(String, String...)
+	 * @see XMLDocument#getElementsByAttributesAndNameOnlyThese(String, String...)
+	 */
+	public List<Element> getElementsByAttributeValueRegex(boolean isOnly,String... valueRegex);
+	/**
+	 * This method can use the element pointer to get the element,
+	 * if you use a element,the default element index will add one,
+	 * such as:
+	 * use method first: a.b.c.d,the default indexs is 0,0,0,0
+	 * use method second: a.b.c.d the default indexs is 1,1,1,1
+	 * use method third: a.d.c.e the default indexs is 2,0,0,0
+	 * @param elementPath the element path
+	 * @return the element index
+	 */
+	public Element getElementByIndexPointer(String elementPath);
+	/**
+	 * you can point the path to a index,like
+	 * seekPoint("a.b",0);
+	 * before: a.b indexs: [a]1,[a.b]9
+	 * now: a.b indexs: [a]1,[a.b]0
+	 * @param elementPath the element path that will be seeked
+	 * @param toPos the after pos
+	 */
+	public void seekPoint(String elementPath,Integer toPos);
 }

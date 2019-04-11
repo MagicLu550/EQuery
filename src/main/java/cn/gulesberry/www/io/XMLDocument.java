@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -98,15 +97,10 @@ import net.noyark.www.list.Query;
 *  @see cn.gulesberry.www.io.DefaultDocument
 *  @see cn.gulesberry.www.io.InitDocument
 */
-public abstract class XMLDocument  implements XMLDomFile{
+public abstract class XMLDocument implements XMLDomFile{
 	
 	private static final long serialVersionUID = 1L;
-	/**This is the POINT for Regular expression
-	 * */
-	public static final String POINT = "\\u002E";
-	/**This is the SLASH for Regular expression
-	 * */
-	public static final String SLASH = "/";
+	
 	/**
 	 *xmlFile is the xml File,you must write the right file
 	 *file can not exist,if it not exist,I can create it
@@ -145,6 +139,10 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 * whether the default xml or not
 	 */
 	protected boolean isDefault;
+	/**
+	 * This is the element pointer
+	 */
+	protected Map<String,Integer> name_pos;
 	/**
 	 * <p>
 	 * This constructor is used to construct 
@@ -303,9 +301,9 @@ public abstract class XMLDocument  implements XMLDomFile{
 			throws IOException {
 			try {
 				writer = new XMLWriter(fos,OutputFormat.createPrettyPrint());
-				} catch (Exception e) {
+			} catch (Exception e) {
 					
-				}
+			}
 			writer.write(doc);
 			writer.close();	
 	}
@@ -401,8 +399,6 @@ public abstract class XMLDocument  implements XMLDomFile{
 	public void load(){
 		xmlFile = new File(file);
 	}
-
-
 	/**
 	* <p>
 	* The <code>getMaxPos</code> method gets the maximum value that 
@@ -847,7 +843,9 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 * @throws IllegalMappingException
 	 */
 	public Element getParent(String path,int...index) throws IllegalMappingException {
-		path = path.substring(0,path.lastIndexOf("."));//get the parent path
+		if(path.indexOf(".")!=-1) {
+			path = path.substring(0,path.lastIndexOf("."));//get the parent path
+		}
 		int[] smallIndex = new int[index.length-1];
 		for(int i = 0;i<smallIndex.length;i++) {
 			smallIndex[i] = index[i];//get parent indexs
@@ -1007,7 +1005,6 @@ public abstract class XMLDocument  implements XMLDomFile{
 		List<Element> all = getAllElements();
 		List<Element> byNameSpace = new ArrayList<>();
 		for(Element e:all) {
-			Namespace namespace;
 			if(isURI) {
 				if(e.getNamespaceURI().equals(uriOrprefix)) {
 					byNameSpace.add(e);
@@ -1118,6 +1115,8 @@ public abstract class XMLDocument  implements XMLDomFile{
 				String s = p.substring(p.indexOf("[")+1,p.indexOf("]"));
 				indexs.add(Integer.parseInt(s));//get the indexs
 				truly.append("."+p.substring(0,p.indexOf("[")));
+			}else {
+				truly.append("."+p);
 			}
 		}
 		String t = truly.substring(1);
@@ -1439,7 +1438,7 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 * to select elements,which is a simpler
 	 * version of xpath
 	 * <br>
-	 * EXPRESSIONS SYNTAX v001:
+	 * EXPRESSIONS SYNTAX v002:
 	 * <br>
 	 *	all element:
 	 * 	all;
@@ -1501,15 +1500,47 @@ public abstract class XMLDocument  implements XMLDomFile{
 	 */
 	public List<Element> EPathSelector(String expressions) {
 		try {
-			String[] childSynax = expressions.split(" ");
+			List<Element> get = new ArrayList<>(); 
+			if(expressions.indexOf("select")!=-1) {
+				String ex = expressions.split("in")[1];
+				if(ex.indexOf("{")!=-1) {
+					expressions = ex.substring(ex.indexOf("{")+1,ex.indexOf("}")).trim();
+				}
+				expressions = ex.trim();
+			}else if(expressions.indexOf("seek")!=-1) {
+				String ex = expressions.split("in")[1];
+				String[] options = XMLHelper.trimAll(ex.split("to"));
+				seekPoint(options[0],Integer.parseInt(options[1].replace(";","")));
+				return null;
+				//seek in a.b to 0
+			}
+			String[] childSynax;
+			if(expressions.indexOf("with")!=-1) {
+				childSynax = XMLHelper.trimAll(expressions.split("with"));
+			}else {
+				childSynax = expressions.split(" ");
+			}
+			String selectorOption;
+			if(childSynax[childSynax.length-1].indexOf("[")!=-1) {
+				selectorOption = childSynax[childSynax.length-1].substring(childSynax[childSynax.length-1].indexOf("[")+1,childSynax[childSynax.length-1].indexOf("]"));//get the third
+			}else {
+				selectorOption = childSynax[childSynax.length-1].replace(";","");
+			}
 			if(childSynax.length==1) {
-				if(childSynax[0].equals("all")) {
+				List<Element> all = new ArrayList<>();
+				if(childSynax[0].equals("all")||childSynax[0].equals("*")) {
 					return getAllElements();
-				}else {
+				}else if(childSynax[0].equals("root")){
+					all.add(getRootElement());
+					return all;
+				}else if(childSynax[0].matches("(all,root)|(root,all)")){
+					all.addAll(getAllElements());
+					all.add(getRootElement());
+					return all;
+				}else{
 					Console.err("the 'all' synax is error");
 				}
 			}else if(childSynax.length==2) {
-				String selectorOption = childSynax[1].substring(childSynax[1].indexOf("[")+1,childSynax[1].indexOf("]"));//get the second
 				switch (selectorOption) {
 					case "one":
 						return $(Query.ELEMENT,childSynax[0]);
@@ -1538,35 +1569,53 @@ public abstract class XMLDocument  implements XMLDomFile{
 							Console.err("the [name] selector synax error:no index");
 						}
 						return getElementsByName(childSynax[0]);
+					case "*path":
+						get.add(getElementByIndexPointer(childSynax[0]));
+						return get;
 					default:
 						Console.err("the [selector] synax is error");
 						break;
 					}
 			}else if(childSynax.length==3) {
-				List<Element> get = new ArrayList<>(); 
 				String firstOption = childSynax[0];//path
 				String middleOption = childSynax[1];//text
-				String selectorOption = childSynax[2].substring(childSynax[2].indexOf("[")+1,childSynax[2].indexOf("]"));//get the third
 				return selectByThreeSynax(get, firstOption, middleOption, selectorOption);
 			//new version
 			}else if(childSynax.length>=4){
 				String firstOption = childSynax[0];//path
-				String selectorOption = childSynax[childSynax.length-1].substring(childSynax[childSynax.length-1].indexOf("[")+1,childSynax[childSynax.length-1].indexOf("]"));//get the third
+				
 				List<String> options = Arrays.asList(selectorOption.split(","));
+				for(int index = 0;index<options.size();index++) {
+					options.set(index,options.get(index).trim());
+				}
 				List<Element> allElement;
 				if(options.contains("name")) {
 					allElement = getElementsByName(firstOption);
-				}else {
+				}else if(options.contains("path")){
 					allElement = getElements(firstOption);//get all middle option
+				}else if(options.contains("all")) {
+					allElement = getAllElements();
+				}else {
+					throw new SynaxException("The first options do not have this field");
 				}
 				boolean isOnly = false;
+				boolean attrRegex = false;
+				boolean textRegex = false;
 				for(int i=0;i<options.size();i++) {
-					String option = options.get(i);
-					if(option.equals("only")){
+					String option = options.get(i).trim();
+					if(option.equals("attrRegex")) {
+						attrRegex = true;
+					}else if(option.equals("textRegex")){
+						textRegex = true;
+					}else if(option.equals("only")){
 						isOnly = true;
-					}else if(!option.trim().equals("name")&&!option.trim().equals("path")&&!option.trim().equals("only")){
+					}else if(!option.trim().equals("name")&&!option.trim().equals("path")&&!option.trim().equals("only")&&!option.trim().equals("regex")){
 						String text;
-						if(isOnly) {
+						if(isOnly&&attrRegex&&textRegex) {
+							text = childSynax[i-3]+"";
+						}else	if((isOnly&&attrRegex)||(isOnly&&attrRegex)||(attrRegex&&textRegex)) {
+							text = childSynax[i-2]+"";
+						}else	if(isOnly||attrRegex||textRegex) {
 							text = childSynax[i-1]+"";
 						}else {
 							text = childSynax[i]+"";
@@ -1580,23 +1629,40 @@ public abstract class XMLDocument  implements XMLDomFile{
 						}else if(option.equals("prefix")){
 							allElement = getByNameSpaceFromElements(allElement,text,null);
 						}else if(option.equals("text")) {
-							allElement = getByTextFromElements(allElement, text);
+							if(textRegex) {
+								allElement = byTextFromThese(text, allElement);
+							}else {
+								allElement = getByTextFromElements(allElement, text);
+							}
 						}else if(option.equals("key=value")){
 							String[] kv = text.split(",");
-							allElement = getByAttributeFromElements(allElement,kv);
+							if(attrRegex) {
+								String[] kvs = kv[0].split("=");
+								allElement = byAttributeFromThese(allElement,kvs[0],kvs[1]);
+							}else {
+								allElement = getByAttributeFromElements(allElement,kv);
+							}
 						}else if(option.equals("key")) {
 							String[] keys = text.split(",");
-							allElement = getByAttributeKeyFromElements(allElement,isOnly,true,keys);
+							if(attrRegex) {
+								allElement = byAttrNameFromThese(allElement, isOnly, true,keys);
+							}else {
+								allElement = getByAttributeKeyFromElements(allElement,isOnly,true,keys);
+							}
 						}else if(option.equals("value")) {
 							String[] values = text.split(",");
-							allElement = getByAttributeKeyFromElements(allElement, isOnly,false, values);
-						}
+							if(attrRegex) {
+								allElement = byAttrNameFromThese(allElement, isOnly, false,values);
+							}else {
+								allElement = getByAttributeKeyFromElements(allElement, isOnly,false, values);
+							}
+						}else if(option.equals("none")) {}
 					}
 				}
 				return allElement;
 			}
 		}catch(StringIndexOutOfBoundsException e2) {
-			Console.err("java StringIndexOutOfBoundsException exception error:the element don't have index");
+			Console.err("java StringIndexOutOfBoundsException exception error:this index is out bounds,no such element");
 		}catch(IndexOutOfBoundsException e1) {
 			Console.err("java IndexOutOfBoundsException exception error:the element in the indexs do not exist");
 		}catch(SynaxException e3) {
@@ -1679,6 +1745,198 @@ public abstract class XMLDocument  implements XMLDomFile{
 	}
 	
 	/**
+	 * This method can get the elements by regex[the text regex]
+	 * you can see more at <code>getElementsByText</code>
+	 * @param textRegex the text regex
+	 * @return the element lists
+	 * @see XMLDocument#getElementsByText(String)
+	 */
+	public List<Element> getElementsByTextWithRegex(String textRegex){
+		return byTextFromThese(textRegex, getAllElements());
+	}
+	/**
+	 * This method can get the elements by regex[the name regex]
+	 * you can see more at <code>getElementsByName</code>
+	 * @param nameRegex the name regex
+	 * @return the element list
+	 * @see XMLDocument#getElementsByName(String)
+	 */
+	public List<Element> getElementsByNameWithRegex(String nameRegex){
+		return byNameFromThese(getAllElements(), nameRegex);
+	}
+	/**
+	 *  This method can get the elements by regex[the attribute name regex]
+	 * you can see more at <code>getElementsByAttributeName</code>
+	 * @param isOnly whether get elements by only these key
+	 * @param nameRegex the name regex
+	 * @return the elements list
+	 * @see XMLDocument#getElementsByAttributesAndName(String, String...)
+	 * @see XMLDocument#getElementsByAttributesAndNameOnlyThese(String, String...)
+	 * @see XMLDocument#getElementsByAttribut(String)
+	 * @see XMLDocument#getElementsByAttribut(String, String)
+	 */
+	public List<Element> getElementsByAttributeNameRegex(boolean isOnly,String... nameRegex){
+		return byAttrNameFromThese(getAllElements(), isOnly,true,nameRegex);
+	}
+	/**
+	 * from default element list,select the elements by regex[element attribute value and key]
+	 * you can see more at <code>getElementsByAttribut</code>
+	 * @param key the attribute key regex
+	 * @param value the attribute value regex
+	 * @return the element list
+	 * @see XMLDocument#getElementsByAttributesAndName(String, String...)
+	 * @see XMLDocument#getElementsByAttributesAndNameOnlyThese(String, String...)
+	 * @see XMLDocument#getElementsByAttribut(String)
+	 * @see XMLDocument#getElementsByAttribut(String, String)
+	 */
+	public List<Element> getElementsByAttributeRegex(String key,String value){
+		return byAttributeFromThese(getAllElements(),key, value);
+	}
+	/**
+	 * This method can use the element pointer to get the element,
+	 * if you use a element,the default element index will add one,
+	 * such as:
+	 * use method first: a.b.c.d,the default indexs is 0,0,0,0
+	 * use method second: a.b.c.d the default indexs is 1,1,1,1
+	 * use method third: a.d.c.e the default indexs is 2,0,0,0
+	 * @param elementPath the element path
+	 * @return the element index
+	 */
+	public Element getElementByIndexPointer(String elementPath) {
+		String[] elements = elementPath.split(POINT);
+		List<String> thePointElement = new ArrayList<>();
+		StringBuilder builder = new StringBuilder(elements[0]);
+		thePointElement.add(builder.toString());
+		for(int i = 1;i<elements.length;i++) {
+			builder.append("."+elements[i]);
+			thePointElement.add(builder.toString());
+		}
+		int[] poses = new int[elements.length];
+		for(int i = 0;i<elements.length;i++) {
+			Integer pos = name_pos.get(thePointElement.get(i))==null?0:name_pos.get(thePointElement.get(i));
+			poses[i] = pos;
+			name_pos.put(thePointElement.get(i),pos+1);
+		}
+		return getElement(elementPath,poses);
+	}
+	/**
+	 * you can point the path to a index,like
+	 * seekPoint("a.b",0);
+	 * before: a.b indexs: [a]1,[a.b]9
+	 * now: a.b indexs: [a]1,[a.b]0
+	 * @param elementPath the element path that will be seeked
+	 * @param toPos the after pos
+	 */
+	public void seekPoint(String elementPath,Integer toPos) {
+		name_pos.put(elementPath,toPos);
+	}
+	/**
+	 * from default element list,select the elements by regex[element attribute value]
+	 * you can see more at <code>getElementsByAttribut</code>
+	 * @param isOnly  whether get elements by only these value
+	 * @param valueRegex the value regex
+	 * @return the element list
+	 * @see XMLDocument#getElementsByAttributesAndName(String, String...)
+	 * @see XMLDocument#getElementsByAttributesAndNameOnlyThese(String, String...)
+	 */
+	public List<Element> getElementsByAttributeValueRegex(boolean isOnly,String... valueRegex){
+		return byAttrNameFromThese(getAllElements(), isOnly,false,valueRegex);
+	}
+	
+	/**
+	 * This method can get the elements by regex[the text regex]
+	 * @param textRegex the text regex
+	 * @param all the default elements list
+	 * @return the element list
+	 * @see XMLDocument#getElementsByText(String)
+	 */
+	private List<Element> byTextFromThese(String textRegex,List<Element> all){
+		List<Element> select = new ArrayList<>();
+		for(Element e:all) {
+			if(e.getTextTrim().matches(textRegex)) {
+				select.add(e);
+			}
+		}
+		return select;
+	}
+	/**
+	 * from default element list,select the elements by regex[element name]
+	 * @param all the default element list
+	 * @param nameRegex the name regex
+	 * @return the list elements
+	 * @see XMLDocument#getElementsByAttributeNameRegex(boolean, String...)
+	 */
+	private List<Element> byNameFromThese(List<Element> all,String nameRegex){
+		List<Element> select = new ArrayList<>();
+		for(Element e:all) {
+			if(e.getName().matches(nameRegex)) {
+				select.add(e);
+			}
+		}
+		return select;
+	}
+	/**
+	 * from default element list,select the elements by regex[element attribute name]
+	 * @param all the default element list
+	 * @param nameRegex the attribute name regex
+	 * @param isOnly whether get the elements with only these attribute
+	 * @param isKey Whether get by the key
+	 * @return the list elements
+	 * @see XMLDocument#getElementsByAttributeNameRegex(boolean, String...)
+	 */
+	@SuppressWarnings("unchecked")
+	private List<Element> byAttrNameFromThese(List<Element> all,boolean isOnly,boolean isKey,String... regex){
+		List<Element> select = new ArrayList<>();
+		for(Element e:all) {
+			List<Attribute> attributes = e.attributes();
+			int index = 0;
+			List<Boolean> flags = new ArrayList<>(); 
+			for(Attribute a:attributes) {
+				if(isKey) {
+					if(a.getName().matches(regex[index])) {
+						flags.add(true);
+						index++;
+					}
+				}else {
+					if(a.getValue().matches(regex[index])) {
+						flags.add(true);
+						index++;
+					}
+				}
+			}
+			if(isOnly) {
+				if(flags.size()==regex.length) {
+					select.add(e);
+				}
+			}else {
+				if(flags.size()>=regex.length) {
+					select.add(e);
+				}
+			}
+		}
+		return select;
+	}
+	/**
+	 * from default element list,select the elements by regex[element attribute name and value]
+	 * @param all the default elements list
+	 * @param name the attribute name
+	 * @param value the attribute value
+	 * @return the elements list
+	 * @see XMLDocument#getElementsByAttribut(String,String)
+	 */
+	private List<Element> byAttributeFromThese(List<Element> all,String name,String value){
+		List<Element> select = new ArrayList<>();
+		for(Element e:all) {
+			Attribute a = e.attribute(name);
+			if(a!=null) {
+				if(a.getValue().equals(value)) {
+					select.add(e);
+				}
+			}
+		}
+		return select;
+	}
+	/**
 	 * This method can select the elements in the element list
 	 * @param list the element list
 	 * @param text the text
@@ -1737,7 +1995,6 @@ public abstract class XMLDocument  implements XMLDomFile{
 		List<Element> get = new ArrayList<>();
 		Map<String, String> alls = new HashMap<>();
 		for(String e:entrys) {
-			
 			String[] s = e.split("=");
 			alls.put(s[0],s[1]);
 		}
@@ -1804,6 +2061,7 @@ public abstract class XMLDocument  implements XMLDomFile{
 		this.xmlFile = new File(this.file);
 		this.list = new ArrayList<SElement>();
 		this.isDefault = isDefault;
+		name_pos = new HashMap<>();
 	}
 	/**
 	 * This can select for three synax,only use inside
