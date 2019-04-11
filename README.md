@@ -159,33 +159,49 @@ Only need to use after
 XMLDomFile xdf = InstanceQueryer.getXMLQuery("default",this);
 ```
 Get the object
-HOW TO USE EPATH
-> How to select a language using epath xml
-* epath is divided into 5 language structures:
-Wildcard expression
-The wildcard expression has a keyword: the all keyword, which can be used to get all the Element objects.
-2. One-dimensional expression
-```xml
+# How to select language using epath xml
+## epath is divided into 5 language structures:
+```
+Starting with version 0.0.2, spaces are replaced with with, ie:
+Select in a with [name];
+Or select in a with name;
+```
+### 1. Wild match expression
+```
+The wildcard expression has two keywords: the all and root keywords. Use the all keyword to get all non-root Element objects.
+The root keyword can get the root node
+All and root combination: all, root Get all nodes
+```
+### 2. One-dimensional expression
+```
+One-dimensional expressions are composed of values ​​and groups, also known as single-group expressions, single-stack expressions, describing one-dimensional expressions that require a keyword to be connected.
+ The basic syntax is: select in value group
+ The following can also be written:
+ Select in value [group]
+ A single set of expressions has 13 group keywords, which are used to describe the feature information indicated by the value (or type).
+ The keyword for a single set of expressions is called a single set of keywords, and most of the keywords here are only used in single-group expressions.
+ Single set of expression keywords:
+ One elements on under ons unders friends ids e_name text parent
+ Name *path
 The expression syntax:
 Other [selector type]
-
 The selector type is an auxiliary selection type with the following auxiliary selection types.
+
 One Select an example: a[0].b[0] [one];
 Elements select multiple a[0].b[0].c [elements];
-On selects the top element of the element (same level)
- a[0].b[0].c[0] [on];
-Under select one of the elements below this element (same level)
-a[0].b[0].c[0] [under];
-Ons selects all elements above the element (same level)
-a[0].b[0].c[0] [ons];
-Unders selects all elements below this element (same level)
-a[0].b[0].c[0] [unders];
+On selects the upper element of the element (same level) a[0].b[0].c[0] [on];
+Under selects the following element of the element (same level a[0].b[0].c[0] [under];
+Ons selects all elements above the element (same level) a[0].b[0].c[0] [ons];
+Unders selects all elements below the element (same level) a[0].b[0].c[0] [unders];
 Friends select all sibling elements a[0].b[0].c[0] [friends];
 Ids selects the element IDVALUE [ids] by the ID attribute;
 E_name selects ELEMENTNAME [e_name] by the name of the element element;
 Text Select ELEMENTTEXT [text];
 Parent gets the parent element a[0].b[0].c[0] [parent]
 Name Get the element by name name [name]
+*path gets the element by the element pointer, plus 1 to the pointer
+See getElementByIndexPointer
+Method a.b [*path]
 Case:
 <root>
 <a>
@@ -195,10 +211,9 @@ Case:
 </root>
 Select the element with the name a:
 a [name]
-
 ```
-3. Two-dimensional expression
-```xml
+### 3. Two-dimensional expression
+```
 The expression syntax:
 Path/name middle [middleType];
 Middle is an attachment selection limit, and middleType is an attachment selection restriction type.
@@ -214,14 +229,17 @@ Text, name is selected by the name of text and element, a exmapleText [text, nam
 Uri queries through the URI of the namespace a[0].b[0].c[0] prefix [prefix];
 Prefix queries through the prefix of the namespace a[0].b[0].c[0] uri [uri];
 ```
-4. Multidimensional expressions
+### 4. Multidimensional expression
 ```
 Multidimensional expressions can query more complex conditions, where keywords can be spliced ​​at will, except
 Grammar:
 ? is optional
-Path/name middle... [name/path,?only,middleType...]
-The name and only keywords must be in front, and the name is in front of only
+All/path/name middle... [all/name/path,?only,middleType...]
+Name and only keywords, regex series must be in front, and name is in front of only, regex is not limited
 Key here
+textRegex [whether or not text is enabled for regular expressions]
+attrRegex [whether key or value is enabled, a single key=value regular expression, currently does not support multiple key=value regulars]
+All
 Path
 Name
 Namespace
@@ -231,11 +249,103 @@ Only
 Key
 Value
 Basically the same
+Select in path with namespace with key with [path,namespace,key]
 ```
-5. Keywords
+### 5.with keywords
 ```
-One elements on under ons unders friends ids e_name text parent name
-Context key value only uri prefix path
+The with keyword has the same effect as a space, used to split the grammar, updated from epath 002, thus guaranteeing grammatical freedom
+At the same time, the epath syntax states that spaces and with cannot coexist.
+Such as:a[0].b[0] with [one]
+```
+### 6. Prefix words,
+```
+Select in optional, can have braces
+Select in {a[0].b[0] with [one]}
+```
+### 7.none keyword
+```
+Select in{all with none with a with [all,only,attrRegex,none,key]}
+This sentence is actually looking for a name element from the regular elements of all elements.
+```
+### 8. Pointer U-turn
+```
+Seek in path to index can implement pointer turn
+Such as:
+Seek in a.b to 0;
+```
+### 9.epathshell
+#### EPATHSHELL stipulates that you must use with
+```
+Call Core.startEPathShell();
+You can use the epath code in the console.
+Epath shell directive:
+Source to import epath file
+Use in replace read file
+Exit(); exit the program
+Print print object, you can directly print the function by print, or print the result of an expression and a string (enclosed by "" or '', does not support splicing);
+Alias<name> (on) select in... is an alias for the queried set of element objects, which can be used in the next statement
+Select in alias name query element collection by alias
+Print select in alias name
+...
+Pathes get path
+Indexs get coordinates
+Use the two together to get the path and coordinates
+Such as:print select in pathes with indexs with *;
+Define function: func name (a,b,c){
+Select in <a> with <b> with <c>
+};
+?: expression, preceded by a boolean expression, followed by two code segments, when true, then executed before, when is false
+Execution behind
+At the same time, a Boolean expression is specified here.
+Sizebig sizesmall == !empty empty
+Sizebig left is larger than right a sizebig b
+Sizesallall left smaller than right a sizesmall b
+== Elements are exactly equal a == b
+!empty is not empty a !empty
+Empty is empty a empty
+Nesting is currently not supported
+Import function library
+Sh library file path
+```
+### 10.Function object
+```
+Bring your own method: excute () method,
+Can be executed immediately when the function is declared, but does not support immediate execution of complex statements.
+Logical judgment and storage variables do not support immediate execution
+```
+### 11. Native function table
+```
+Currently the native function has
+Exit function
+Excute function
+...
+```
+### 12. Operators [epath only supports native statements]
+```
+Logical operators: sizebig sizesmall == !empty empty
+Function operator: in to
+Logical control: ?: (select in *==select in * ?print "1":print "2")
+Importer: sh (filename) source (to filename) use (in filename)
+Connector: (a) with (b)
+Multi-level separator:
+Query character: select (in)
+Output: print (select in .../""/'')
+Memory import character: alias<> func (name(){};)
+Memory export character: select in alias (name), name();
+````
+### 13.Script file
+```
+The epath script file is a .epath suffix file, which is imported by source. Note that the import only supports epath syntax.
+Select in *;
+Select in a with name;
+The epath shell function script file is .func, imported via sh, note that the import supports the epath shell and epath syntax, and the code segment must be split by function.
+#epath shell equery.func
+Func test(){
+Select in *;
+};
+Func test1(){
+Select in * == select in *?print "1":print '2';
+};
 ```
 
 The final reminder is that you must use the maven project to import the plugin. Finally, the configuration file is in the src/main/resources/ directory. You need to copy the configuration file to your directory.
