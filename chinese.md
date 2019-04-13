@@ -290,7 +290,7 @@ indexs获取坐标
 两个一起使用获取路径和坐标
 such as:print select in pathes with indexs with *;
 定义函数:func name (a,b,c){
-select in <a> with <b> with <c>
+select in @a with @b with @c
 };
 ?:表达式，前面为布尔表达式，后面为两个代码段,当为true,则执行前面，当为false
 执行后面
