@@ -292,7 +292,7 @@ Indexs get coordinates
 Use the two together to get the path and coordinates
 Such as:print select in pathes with indexs with *;
 Define function: func name (a,b,c){
-Select in <a> with <b> with <c>
+Select in @a with @b with @b
 };
 ?: expression, preceded by a boolean expression, followed by two code segments, when true, then executed before, when is false
 Execution behind
