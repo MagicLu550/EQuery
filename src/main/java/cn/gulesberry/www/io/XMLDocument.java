@@ -55,6 +55,7 @@ import org.dom4j.io.XMLWriter;
 
 import cn.gulesberry.www.conn.ConnectApplicationDB;
 import cn.gulesberry.www.conn.ConnectionBase;
+import cn.gulesberry.www.consolelog.EPathApplication;
 import cn.gulesberry.www.entity.SElement;
 import cn.gulesberry.www.exception.IllegalMappingException;
 import cn.gulesberry.www.exception.IndexLengthException;
@@ -68,6 +69,7 @@ import cn.gulesberry.www.utils.tree.ElementTree;
 import cn.gulesberry.www.utils.tree.TreeWaterMan;
 import net.noyark.www.console.Console;
 import net.noyark.www.interf.Branch;
+import net.noyark.www.interf.EPathAbastractApplication;
 import net.noyark.www.interf.Manager;
 import net.noyark.www.interf.Table;
 import net.noyark.www.interf.Tree;
@@ -143,6 +145,10 @@ public abstract class XMLDocument implements XMLDomFile{
 	 * This is the element pointer
 	 */
 	protected Map<String,Integer> name_pos;
+	/**
+	 * the epath shell application
+	 */
+	protected EPathAbastractApplication application;
 	/**
 	 * <p>
 	 * This constructor is used to construct 
@@ -1842,7 +1848,17 @@ public abstract class XMLDocument implements XMLDomFile{
 	public List<Element> getElementsByAttributeValueRegex(boolean isOnly,String... valueRegex){
 		return byAttrNameFromThese(getAllElements(), isOnly,false,valueRegex);
 	}
-	
+	/**
+	 * It can excute the epath shell code,and return the elements
+	 * @return element objects
+	 * @throws DocumentException 
+	 * @throws IOException 
+	 * @throws IndexLengthException 
+	 * @throws IllegalMappingException 
+	 */
+	public List<Element> excuteEPathShell(String code) throws IllegalMappingException, IndexLengthException, IOException, DocumentException{
+		return application.excuteShell(this, new StringBuilder(code));
+	}
 	/**
 	 * This method can get the elements by regex[the text regex]
 	 * @param textRegex the text regex
@@ -2062,6 +2078,7 @@ public abstract class XMLDocument implements XMLDomFile{
 		this.list = new ArrayList<SElement>();
 		this.isDefault = isDefault;
 		name_pos = new HashMap<>();
+		application = new EPathApplication(-1);
 	}
 	/**
 	 * This can select for three synax,only use inside

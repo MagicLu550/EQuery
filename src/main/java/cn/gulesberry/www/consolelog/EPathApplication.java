@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.callback.LanguageCallback;
 
 import org.dom4j.Attribute;
 import org.dom4j.DocumentException;
@@ -38,6 +36,9 @@ public class EPathApplication implements EPathAbastractApplication{
 	
 	public EPathApplication() throws IllegalMappingException, IndexLengthException, DocumentException, IOException {
 		thenInput(firstInPut());
+	}
+	public EPathApplication(int i) {
+		
 	}
 	private XMLDomFile firstInPut() throws IllegalMappingException, IndexLengthException, DocumentException, IOException {
 		log("------------epath selector v 0.0.3---------------");
@@ -73,6 +74,10 @@ public class EPathApplication implements EPathAbastractApplication{
 			if(things.substring(things.indexOf("t")+1).trim().startsWith("alias")) {
 				aliasSet(lang, list);
 			}
+			String ifAlias = builder.toString().replace(" ","").substring(builder.indexOf("t"));
+			if(ifAlias.indexOf("alias")!=-1&&!ifAlias.startsWith("alias")) {
+				list = getAlias(lang,new boolean[2]);
+			}
 			log("query "+list.size()+" elements");	
 			print(lang,list,xmlDomFile);
 			return true;
@@ -83,66 +88,16 @@ public class EPathApplication implements EPathAbastractApplication{
 	
 	private void getPut(XMLDomFile xmlDomFile) throws IllegalMappingException, IndexLengthException, IOException, DocumentException {
 		log("you can input the epath expressions[and 'use in' to use other file]");
+		
 		while(true) {
 			StringBuilder builder = inputCode(xmlDomFile);
-			String lang = builder.toString();
-			List<Element> list = null;
 			long start = System.currentTimeMillis();
 			try {
-				//getInput
-				boolean showed = showFunc(xmlDomFile,lang);
-				boolean exited = exited(xmlDomFile, lang);
-				boolean printMethod = printMethod(lang);
-				if(showed) {
-					continue;
-				}
-				if(exited) {
-					break;
-				}
-				//是否打印方法
-				if(printMethod==false) {
-					List<String> funces = readAll(lang);
-					//控制几个指令
-					boolean createdFunc = createFunction(funces,xmlDomFile);
-					boolean haveUseIn = useIn(lang, xmlDomFile);
-					boolean isSourced = sourceTo(lang, xmlDomFile);
-					boolean startAlias = aliased(lang);
-					lang = excuteFunc(lang);
-					String excuteAfter = lang;
-					lang = setIf(lang, xmlDomFile);
-					lang = excuteFunc(lang);
-					lang = setSelect(lang);
-					//getAlias
-					boolean[] isAliasHave = new boolean[2];
-					list = getAlias(lang,isAliasHave);
-					boolean isContinue = isAliasHave[0]; 
-					boolean isAlias = isAliasHave[1];
-					PrintCase printCase = howPrint(lang);
-					boolean justPrint = printCase.isJustPrint();
-					lang = printCase.getLang();
-					if(haveUseIn||createdFunc||isSourced||isContinue||lang.startsWith("seek")) {
-						if(lang.startsWith("seek")) {
-							log("seek successfully");
-						}
-						continue;
-					}
-					list = new ArrayList<>();
-					boolean printOver = excuteEPath(justPrint, isAlias, createdFunc, startAlias, list, xmlDomFile, lang, builder);
-					if(printOver) {
-						continue;
-					}
-					long end = System.currentTimeMillis();
-					log("use "+(end-start)+" ms");
-					boolean printed = commonPrint(builder, excuteAfter, lang, list, xmlDomFile);
-					if(printed) {
-						continue;
-					}
+				List<Element> list = excuteShell(xmlDomFile, builder);
+				long end = System.currentTimeMillis();
+				log("use "+(end-start)+" ms");
+				if(list!=null)
 					doNext(list, xmlDomFile);
-				}else {
-					long end = new Date().getTime();
-					log("use "+(end-start)+" ms");
-					printFunction(lang, xmlDomFile, list);
-				}
 			}catch(SynaxException e) {
 				err("error,the expressions have synax error!:"+e.getMessage());
 				if(builder.indexOf("print")!=-1) {
@@ -157,7 +112,64 @@ public class EPathApplication implements EPathAbastractApplication{
 			}	
 		}
 	}
-	
+	public List<Element> excuteShell(XMLDomFile xmlDomFile,StringBuilder builder) throws IOException, IllegalMappingException, IndexLengthException, DocumentException {
+			List<Element> list = null;
+			String lang = builder.toString();
+			//getInput
+			boolean showed = showFunc(xmlDomFile,lang);
+			boolean exited = exited(xmlDomFile, lang);
+			boolean printMethod = printMethod(lang);
+			if(showed) {
+				return list;
+			}
+			if(exited) {
+				System.exit(0);
+			}
+			//是否打印方法
+			if(printMethod==false) {
+				List<String> funces = readAll(lang);
+				//控制几个指令
+				boolean createdFunc = createFunction(funces,xmlDomFile);
+				boolean haveUseIn = useIn(lang, xmlDomFile);
+				boolean isSourced = sourceTo(lang, xmlDomFile);
+				boolean startAlias = aliased(lang);
+				lang = excuteFunc(lang);
+				String excuteAfter = lang;
+				lang = setIf(lang, xmlDomFile);
+				lang = excuteFunc(lang);
+				String alias = lang;
+				//getAlias
+				boolean[] isAliasHave = new boolean[2];
+				list = getAlias(lang,isAliasHave);
+				boolean isContinue = isAliasHave[0]; 
+				boolean isAlias = isAliasHave[1];
+				lang = setSelect(lang);
+				PrintCase printCase = howPrint(lang);
+				boolean justPrint = printCase.isJustPrint();
+				lang = printCase.getLang();
+				if(haveUseIn||createdFunc||isSourced||isContinue||lang.startsWith("seek")) {
+					if(lang.startsWith("seek")) {
+						log("seek successfully");
+					}
+					return list;
+				}
+				list = new ArrayList<>();
+				boolean printOver = excuteEPath(justPrint, isAlias, createdFunc, startAlias, list, xmlDomFile, lang, builder);
+				
+				if(printOver) {
+					return null;
+				}
+				boolean printed = commonPrint(builder, excuteAfter, lang, list, xmlDomFile);
+				if(printed) {
+					return null;
+				}
+				aliasSet(alias, list);
+			}else {
+				printFunction(lang, xmlDomFile, list);
+				return null;
+			}
+			return list;
+	}
 	private void doNext(List<Element> list,XMLDomFile xmlDomFile) throws IOException {
 		log("query "+list.size()+" elements");
 		log("---what do you want to use these elements?"
@@ -169,7 +181,12 @@ public class EPathApplication implements EPathAbastractApplication{
 	}
 	private void printFunction(String lang,XMLDomFile xmlDomFile,List<Element> list) {
 		lang = excuteFunc(lang.replace(" ","").substring(lang.indexOf("t")+1));
-		List<Element> all = xmlDomFile.EPathSelector(lang);
+		List<Element> all ;
+		if(lang.indexOf("alias")!=-1&&!lang.startsWith("alias")) {
+			all = getAlias(lang,new boolean[2]);
+		}else {
+			all =xmlDomFile.EPathSelector(lang);
+		}
 		list = all;
 		print(lang, list, xmlDomFile);
 	}
@@ -219,10 +236,10 @@ public class EPathApplication implements EPathAbastractApplication{
 					String field = func.getField();
 					int i = 0;
 					for(String arg:args) {
-						field = field.replace("<"+arg+">",newArgs[i]);
+						field = field.replace("@"+arg,newArgs[i]);
 						i++;
 					}
-					lang = field;
+					lang = field;//TODO ALIAS
 				}else {
 					lang = func.getField();
 				}
@@ -247,9 +264,16 @@ public class EPathApplication implements EPathAbastractApplication{
 			List<Element> l1 = null;
 			List<Element> l2 = null;
 			if(bool.indexOf("empty")==-1) {
-				String[] withOp = bool.split("(sizebig|sizesmall|==)");
-				String op1 = excuteFunc(withOp[0].replaceAll("[\\(\\)]",""));
-				String op2 = excuteFunc(withOp[1].replaceAll("[\\(\\)]",""));
+				String op1;
+				String op2;
+				try {
+					String[] withOp = bool.split("(sizebig|sizesmall|==)");
+					op1 = excuteFunc(withOp[0].replaceAll("[\\(\\)]",""));
+					op2 = excuteFunc(withOp[1].replaceAll("[\\(\\)]",""));
+				}catch(IndexOutOfBoundsException e) {
+					err("no boolean near '?'");
+					return lang;
+				}
 				excuteNotSuccess[0] = false;
 				if(op1.indexOf("alias")!=-1) {
 					op1 = op1.substring(op1.indexOf("alias")+"alias".length()).replace(";","").trim();
@@ -367,7 +391,9 @@ public class EPathApplication implements EPathAbastractApplication{
 							print(that.substring(that.replace(" ","").indexOf("t")+1), list, xmlDomFile);
 							continue;
 						}
-						log("query "+list.size()+" elements");
+						if(funces.get(i).indexOf("alias")!=-1) {
+							log("query "+list.size()+" elements");
+						}
 						log("Simple excute function:"
 								+ "\n[setText to text/delete/addAttribute to key=value,key=value/getText/getAllAttributes/no]\"");
 						String use = in();
@@ -513,6 +539,9 @@ public class EPathApplication implements EPathAbastractApplication{
 				isAliasHave[0] = true;
 				//continue
 			}
+			if(list!=null) {
+				log("query "+list.size()+" elements");
+			}
 			isAliasHave[1] = true;
 		}
 		return list;
@@ -521,7 +550,8 @@ public class EPathApplication implements EPathAbastractApplication{
 		if(justPrint == false) {
 			if(!isAlias&&!createdFunc) {
 				//The Main
-				list.addAll(xmlDomFile.EPathSelector(lang.replace(";","").replace("pathes","").replace("indexs","")));
+				lang = lang.replace(";","").replace("pathes","").replace("indexs","");
+				list.addAll(xmlDomFile.EPathSelector(lang));
 				if(startAlias) {
 					aliasSet(builder.toString(), list);
 				}

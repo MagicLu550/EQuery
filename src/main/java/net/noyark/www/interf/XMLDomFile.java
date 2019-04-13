@@ -27,7 +27,6 @@ package net.noyark.www.interf;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1323,4 +1322,17 @@ public interface XMLDomFile extends Serializable,Cloneable{
 	 * @param toPos the after pos
 	 */
 	public void seekPoint(String elementPath,Integer toPos);
+	/**
+	 * It can excute the epath shell code,and return the elements
+	 * @return element objects
+	 * @throws DocumentException 
+	 * @throws IOException 
+	 * @throws IndexLengthException 
+	 * @throws IllegalMappingException 
+	 */
+	public List<Element> excuteEPathShell(String code) 
+			throws IllegalMappingException, 
+			IndexLengthException, 
+			IOException, 
+			DocumentException;
 }
