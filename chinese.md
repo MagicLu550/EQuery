@@ -353,7 +353,7 @@ select in * == select in *?print "1":print '2';
 <dependency>
   <groupId>net.noyark</groupId>
   <artifactId>equery-framework</artifactId>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
 </dependency>
 <!--链接私服-->
 <repositories>
